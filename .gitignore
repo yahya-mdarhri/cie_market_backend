@@ -1,4 +1,12 @@
 # venv
-.venv
-# python 
+.venv/
+
+# python byteCompiled/cache
 __pycache__/
+*.py[cod]
+
+#db
+*.sqlite3
+
+# other
+.DS_Store
