@@ -33,7 +33,7 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 
 # Application definition
 
-AUTH_USER_MODEL = 'inventors.Inventor' # the auth user may change to a different model later
+# AUTH_USER_MODEL = 'inventors.Inventor' # the auth user may change to a different model later
 
 INSTALLED_APPS = [
     'inventors',
