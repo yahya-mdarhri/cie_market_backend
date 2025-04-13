@@ -8,7 +8,7 @@ class Inventor(models.Model):
   # to use default auto incrementing id 
   Inventor_id = models.CharField(max_length=10, unique=True, primary_key=True) 
   preferred_name = models.CharField(max_length=150, null=False)
-  name_variants = models.ArrayField(
+  name_variants = ArrayField(
     models.CharField(max_length=30),
     blank=True,
     null=True,
