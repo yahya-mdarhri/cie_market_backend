@@ -24,13 +24,16 @@ from .utils import (
 from .models import User
 from .serializers import UserSerializer
 
-# Create your views here.
+# just a view to test auth permissions
 class HomeView(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
     def list(self, request):
-        return Response({'message': 'Welcome to the API!'}, status=status.HTTP_200_OK)
+        user = request.user
+        return Response({'message': f'Welcome {user}, to the API!'}, status=status.HTTP_200_OK)
 
+
+# view endpoint to register a new user
 class RegisterView(viewsets.ViewSet):
     permission_classes = [permissions.AllowAny]
 
@@ -41,13 +44,19 @@ class RegisterView(viewsets.ViewSet):
             return Response({'message': 'User registered successfully'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+# view endpoint to login a new user
 class LoginView(viewsets.ViewSet):
     permission_classes = [AllowAny]
     authentication_classes = []
 
     def create(self, request):
-        email = request.data.get('email').lower()
+        email = request.data.get('email')
         password = request.data.get('password')
+        if email is None or password is None:
+            return Response({
+                'error': 'Please provide both email and password.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        email = email.lower()
         user = authenticate(request, username=email, password=password)
         if user:
             login(request, user)
@@ -58,12 +67,8 @@ class LoginView(viewsets.ViewSet):
             }, status=status.HTTP_200_OK)
             store_token_in_cookies(response, access_token)
             return response
-        if not User.objects.filter(username=username).exists():
-            return Response({
-                'error': 'A user with that username does not exist.'
-            }, status=status.HTTP_404_NOT_FOUND)
         return Response({
-            'error': 'A user with that password does not exist.'
+            'error': 'Please provide the correct email and password.'
         }, status=status.HTTP_404_NOT_FOUND)
     
 
