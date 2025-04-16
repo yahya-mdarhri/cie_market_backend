@@ -43,14 +43,14 @@ jobs:
           echo "JWT_ALGORITHM=${{ secrets.JWT_ALGORITHM }}" >> .env
           echo "JWT_EXP_DELTA_SECONDS=${{ secrets.JWT_EXP_DELTA_SECONDS }}" >> .env
       
-      - name: 🧪 Debug env vars
-        run: printenv
+      - name: 🧪 load env vars
+        run: source .env
 
-      # - name: 📦 Run makemigrations
-      #   run: python manage.py makemigrations
+      - name: 📦 Run makemigrations
+        run: python manage.py makemigrations
 
-      # - name: 📦 Run migrations
-      #   run: python manage.py migrate
+      - name: 📦 Run migrations
+        run: python manage.py migrate
 
-      # - name: 🧪 Run tests
-      #   run: python manage.py test
+      - name: 🧪 Run tests
+        run: python manage.py test
