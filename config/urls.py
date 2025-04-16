@@ -22,4 +22,5 @@ urlpatterns = [
     path('', HomeView.as_view({'get':'list'}), name='home'),
     path('admin/', admin.site.urls),
     path('api/accounts/', include('accounts.urls')),
+    path('api/inventors/', include('inventors.urls')),
 ]
