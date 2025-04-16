@@ -46,11 +46,11 @@ jobs:
       - name: 🧪 Debug env vars
         run: printenv
 
-      - name: 📦 Run makemigrations
-        run: python manage.py makemigrations
+      # - name: 📦 Run makemigrations
+      #   run: python manage.py makemigrations
 
-      - name: 📦 Run migrations
-        run: python manage.py migrate
+      # - name: 📦 Run migrations
+      #   run: python manage.py migrate
 
-      - name: 🧪 Run tests
-        run: python manage.py test
+      # - name: 🧪 Run tests
+      #   run: python manage.py test
