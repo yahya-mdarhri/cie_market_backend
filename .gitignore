@@ -1,1 +1,15 @@
-.venv
+# venv
+.venv/
+
+# env files
+.env
+
+# python byteCompiled/cache
+__pycache__/
+*.py[cod]
+
+#db
+*.sqlite3
+
+# other
+.DS_Store
