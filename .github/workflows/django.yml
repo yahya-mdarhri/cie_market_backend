@@ -28,23 +28,25 @@ jobs:
       - name: 🔐 Create .env file from GitHub Secrets
         working-directory: ./cie_market_backend 
         run: |
-          echo "# Django Environment Variables"
+          echo "# Django Environment Variables" >> .env
           echo "DJANGO_DEBUG=${{ secrets.DJANGO_DEBUG }}" >> .env
           echo "ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}" >> .env
           echo "DJANGO_SETTINGS_MODULE=${{ secrets.DJANGO_SETTINGS_MODULE }}" >> .env
           echo "DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" >> .env
-          echo "# PostgreSQL Database Configuration"
+          echo "# PostgreSQL Database Configuration" >> .env
           echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
           echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env
           echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
           echo "DB_USER=${{ secrets.DB_USER }}" >> .env
           echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
-          echo "# JWT Configuration"
+          echo "# JWT Configuration" >> .env
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
           echo "JWT_ALGORITHM=${{ secrets.JWT_ALGORITHM }}" >> .env
           echo "JWT_EXP_DELTA_SECONDS=${{ secrets.JWT_EXP_DELTA_SECONDS }}" >> .env
       - name: 📦 Run makemigrations
-        run: python manage.py makemigrations
+        run: |
+          cat .env
+          python manage.py makemigrations
 
       - name: 📦 Run migrations
         run: python manage.py migrate
