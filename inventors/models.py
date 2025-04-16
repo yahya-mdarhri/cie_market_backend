@@ -51,6 +51,9 @@ class Ticket(models.Model):
   meeting_date = models.DateTimeField(null=True, blank=True)
   created_at = models.DateTimeField(auto_now_add=True)
 
+  class Meta:
+    db_table = 'tickets'
+
 class Patent(models.Model):
   RESEARCH_REPORT_RESULT = ( # will be change
     ('A', 'MAI'), # manque de activité invontive
@@ -74,7 +77,7 @@ class Patent(models.Model):
     ('D', 'DEVICE'),
     ('E', 'MATERIAL'),
   )
-  SECTOR = {
+  SECTOR = (
     ("A", "Aerospace & Defense"),
     ("B", "Agriculture"),
     ("C", "Automotive & Transportation"),
@@ -87,7 +90,7 @@ class Patent(models.Model):
     ("J", "Information Technology & Software"),
     ("K", "Manufacturing & Industrial Equipment"),
     ("L", "Telecommunications"),
-  }
+  )
 
   title = models.CharField(max_length=255, null=False, blank=False)
   deposit_number = models.BigIntegerField(null=False, unique=True)
@@ -113,3 +116,6 @@ class Patent(models.Model):
     blank=True,
     default=list,
   )
+
+  class Meta:
+    db_table = 'patents'
