@@ -26,16 +26,18 @@ from .serializers import UserSerializer
 
 # just a view to test auth permissions
 class HomeView(viewsets.ViewSet):
+    # authentication_classes = []
     permission_classes = [IsAuthenticated]
 
-    def list(self, request):
+    def list(self, request, format="json"):
         user = request.user
         return Response({'message': f'Welcome {user}, to the API!'}, status=status.HTTP_200_OK)
 
 
 # view endpoint to register a new user
 class RegisterView(viewsets.ViewSet):
-    permission_classes = [permissions.AllowAny]
+    authentication_classes = []
+    permission_classes = [AllowAny]
 
     def create(self, request):
         serializer = UserSerializer(data=request.data)
@@ -46,8 +48,8 @@ class RegisterView(viewsets.ViewSet):
 
 # view endpoint to login a new user
 class LoginView(viewsets.ViewSet):
-    permission_classes = [AllowAny]
     authentication_classes = []
+    permission_classes = [AllowAny]
 
     def create(self, request):
         email = request.data.get('email')
