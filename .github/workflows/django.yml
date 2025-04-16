@@ -26,7 +26,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: 🔐 Create .env file from GitHub Secrets
-        working-directory: ./cie_market_backend 
         run: |
           echo "# Django Environment Variables" >> .env
           echo "DJANGO_DEBUG=${{ secrets.DJANGO_DEBUG }}" >> .env
