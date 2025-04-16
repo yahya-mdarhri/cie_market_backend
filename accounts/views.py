@@ -29,7 +29,7 @@ class HomeView(viewsets.ViewSet):
     # authentication_classes = []
     permission_classes = [IsAuthenticated]
 
-    def list(self, request, format="json"):
+    def list(self, request):
         user = request.user
         return Response({'message': f'Welcome {user}, to the API!'}, status=status.HTTP_200_OK)
 
