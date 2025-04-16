@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 from decouple import Config, Csv
 
@@ -32,10 +33,19 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 
 # Application definition
 
-# AUTH_USER_MODEL = 'inventors.Inventor' # the auth user may change to a different model later
+AUTH_COOKIE = 'access_token'
+
+AUTH_USER_MODEL = 'accounts.User'
+
+JWT_SECRET = config('JWT_SECRET')
+JWT_ALGORITHM = config('JWT_ALGORITHM')
+JWT_EXP_DELTA_SECONDS = config("JWT_EXP_DELTA_SECONDS", default=3600, cast=int)
 
 INSTALLED_APPS = [
+    'accounts',
     'inventors',
+
+    'rest_framework',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -44,6 +54,21 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'accounts.authentication.TokenAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

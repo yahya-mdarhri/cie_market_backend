@@ -1,3 +1,77 @@
-from django.shortcuts import render
 
-# Create your views here.
+from rest_framework.views import APIView
+from rest_framework.permissions import (
+    AllowAny,
+    IsAuthenticated,
+)
+from rest_framework import (
+    status,
+    viewsets
+)
+from rest_framework.response import Response
+from rest_framework import status
+
+from .models import *
+from .serializers import *
+
+
+#this endpoint is used going to change depending on the what a user can see
+
+class ListAffiliationsView(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request):
+        affiliations = Affiliation.objects.all()
+        serializer = AffiliationSerializer(affiliations, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class GetAffiliationView(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request, id=None):
+        try:
+            affiliation = Affiliation.objects.get(id=id)
+            serializer = AffiliationSerializer(affiliation)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Affiliation.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+class ListInventorsView(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request):
+        inventors = Inventor.objects.all()
+        serializer = InventorSerializer(inventors, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class GetAffiliationView(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request, id=None):
+        try: 
+            affiliation = Inventor.objects.get(id=id)
+            serializer = InventorSerializer(affiliation)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Inventor.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+          
+
+
+class ListPatentsView(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request):
+        patents = Patent.objects.all()
+        serializer = PatentSerializer(patents, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class GetPatentView(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request, id=None):
+        try:
+            patent = Inventor.objects.get(id=id)
+            serializer = PatentSerializer(patent)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Inventor.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
