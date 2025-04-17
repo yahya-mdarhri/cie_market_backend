@@ -61,9 +61,11 @@ class ListPatentsView(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
     def list(self, request):
-        patents = Patent.objects.all()
-        serializer = PatentSerializer(patents, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+      user = request.user
+      inventor = user.inventor
+      patents = Patent.objects.filter(inventors=inventor)
+      serializer = PatentSerializer(patents, many=True)
+      return Response(serializer.data, status=status.HTTP_200_OK)
 
 class GetPatentView(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]

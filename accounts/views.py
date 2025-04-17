@@ -31,7 +31,8 @@ class HomeView(viewsets.ViewSet):
 
     def list(self, request):
         user = request.user
-        return Response({'message': f'Welcome {user}, to the API!'}, status=status.HTTP_200_OK)
+        serializer = UserSerializer(user)
+        return Response({'message': f'Welcome {user}, to the API!', 'data':serializer.data}, status=status.HTTP_200_OK)
 
 
 # view endpoint to register a new user
