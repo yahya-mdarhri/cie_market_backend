@@ -22,10 +22,16 @@ class Inventor(models.Model):
     null=True,
     default=list,
   )
-  affiliation = models.ManyToManyField(Affiliation, related_name='+', blank=True)  # inventor -> affiliations (1-way)
-  email = models.EmailField(unique=True, default=None)
+  affiliation = models.ForeignKey(
+    Affiliation,
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True,
+    related_name='inventors'
+  )
+  email = models.EmailField(default=None)
   image = models.ImageField(upload_to='inventors/images/', default=None, blank=True, null=True)
-  orcid = models.CharField(max_length=19, unique=True, default=None, blank=True, null=True)
+  orcid = models.CharField(max_length=19, default=None, blank=True, null=True)
   phone_number = models.CharField(max_length=11, blank=True, null=True, default=None)
 
   def __str__(self):
@@ -102,10 +108,16 @@ class Patent(models.Model):
   delivery_document = models.CharField(max_length=255, null=False, blank=False) # maybe a file field
   delivery_date = models.DateField(null=False)
   status = models.CharField(max_length=1, choices=PATENT_STATUS, null=False, default='A') # Note_1
-  inventors = models.ManyToManyField(Inventor, related_name='+') # no reverse relation
+  inventors = models.ManyToManyField(Inventor, related_name='inventors') # no reverse relation
   TRL_level = models.BigIntegerField(null=True, blank=True)
   CRL_level = models.BigIntegerField(null=True, blank=True)
-  affiliation = models.ManyToManyField(Affiliation, related_name='+', blank=True) # no reverse relation
+  affiliation = models.ForeignKey(
+    Affiliation,
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True,
+    related_name='patents'
+  )
   abstract = models.TextField(null=False, blank=False)
   contract_type = models.CharField(max_length=1, choices=CONTRACT_TYPE, null=False, default='A') # Note_1
   sector = models.CharField(max_length=1, choices=SECTOR, null=False, default='A') # Note_1

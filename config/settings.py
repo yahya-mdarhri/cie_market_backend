@@ -39,7 +39,7 @@ AUTH_USER_MODEL = 'accounts.User'
 
 JWT_SECRET = config('JWT_SECRET')
 JWT_ALGORITHM = config('JWT_ALGORITHM')
-JWT_EXP_DELTA_SECONDS = config("JWT_EXP_DELTA_SECONDS", default=3600, cast=int)
+JWT_EXP_DELTA_SECONDS = config("JWT_EXP_DELTA_SECONDS", default=3600000, cast=int)
 
 INSTALLED_APPS = [
     'accounts',
