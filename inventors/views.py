@@ -132,3 +132,18 @@ class GetInventorCoInventorsView(viewsets.ViewSet):
       return Response(serializer.data, status=status.HTTP_200_OK)
     except Inventor.DoesNotExist:
       return Response(status=status.HTTP_404_NOT_FOUND)
+    
+
+
+class GetSharedPatentsView(viewsets.ViewSet):
+  permission_classes = [IsAuthenticated]
+
+  def list(self, request, inv_a=None, inv_b=None):
+    try:
+      inventor_a = Inventor.objects.get(id=inv_a)
+      inventor_b = Inventor.objects.get(id=inv_b)
+      patents = Patent.objects.filter(inventors=inventor_a).filter(inventors=inventor_b)
+      serializer = PatentSerializer(patents, many=True)
+      return Response(serializer.data, status=status.HTTP_200_OK)
+    except Inventor.DoesNotExist:
+      return Response(status=status.HTTP_404_NOT_FOUND)
