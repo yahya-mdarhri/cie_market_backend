@@ -12,6 +12,7 @@ router.register(r'affiliations', ListAffiliationsView, basename='affiliations')
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('patents/', ListPatentsView.as_view({'get': 'list'}), name='pmy-patents'),
     path('patent/<int:id>/', GetPatentView.as_view({'get': 'list'}), name='patent-detail'),
     
     path('inventor/co-inventors', GetCoInventorsView.as_view({'get': 'list'}), name='my-coInventors'),
