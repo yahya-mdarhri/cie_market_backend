@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'accounts',
     'inventors',
 
+    'drf_yasg',
     'rest_framework',
 
     'django.contrib.admin',
