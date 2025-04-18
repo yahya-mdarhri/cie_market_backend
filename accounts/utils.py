@@ -1,6 +1,6 @@
 import jwt
 from django.conf import settings
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from rest_framework_simplejwt.tokens import RefreshToken
 
 def generate_jwt_token(user_id):
@@ -27,10 +27,12 @@ def get_tokens_for_user(user) -> tuple[str, str]:
 
 
 def store_token_in_cookies(response, token) -> None:
+    lifetime = settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME']
+    expires_at = datetime.now(timezone.utc) + lifetime
     response.set_cookie(
         settings.AUTH_COOKIE,
         value=token,
-        expires=settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'],
+        expires=expires_at,
         httponly=settings.SESSION_COOKIE_HTTPONLY,
         samesite=settings.SESSION_COOKIE_SAMESITE
     )
