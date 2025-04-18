@@ -14,6 +14,8 @@ urlpatterns = [
     path('', include(router.urls)),
     path('patent/<int:id>/', GetPatentView.as_view({'get': 'list'}), name='patent-detail'),
     path('inventor/<str:id>/', GetInventorsView.as_view({'get': 'list'}), name='inventor-detail'),
+    path('inventor/<str:id>/patents', GetInventorPatentsView.as_view({'get': 'list'}), name='inventor-detail'),
+    # path('inventor/<str:id>/co-inventors', GetInventorsView.as_view({'get': 'list'}), name='co-inventors'),
     path('affiliation/<str:id>/', GetAffiliationView.as_view({'get': 'list'}), name='affiliation-detail'),
 ]
 # email=a@email.com&password=hamza
