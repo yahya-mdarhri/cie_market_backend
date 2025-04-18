@@ -101,3 +101,34 @@ class GetAffiliationPatentsView(viewsets.ViewSet):
       return Response(serializer.data, status=status.HTTP_200_OK)
     except Affiliation.DoesNotExist:
       return Response(status=status.HTTP_404_NOT_FOUND)
+    
+class GetCoInventorsView(viewsets.ViewSet):
+  permission_classes = [IsAuthenticated]
+
+  def list(self, request):
+    user = request.user
+    try:
+      inventor = user.inventor
+      patents = Patent.objects.filter(inventors=inventor)
+      co_inventors = set()
+      for patent in patents:
+        co_inventors.update(patent.inventors.exclude(id=inventor.id))
+      serializer = InventorSerializer(co_inventors, many=True)
+      return Response(serializer.data, status=status.HTTP_200_OK)
+    except Inventor.DoesNotExist:
+      return Response(status=status.HTTP_404_NOT_FOUND)
+
+class GetInventorCoInventorsView(viewsets.ViewSet):
+  permission_classes = [IsAuthenticated]
+
+  def list(self, request, id=None):
+    try:
+      inventor = Inventor.objects.get(id=id)
+      patents = Patent.objects.filter(inventors=inventor)
+      co_inventors = set()
+      for patent in patents:
+        co_inventors.update(patent.inventors.exclude(id=id))
+      serializer = InventorSerializer(co_inventors, many=True)
+      return Response(serializer.data, status=status.HTTP_200_OK)
+    except Inventor.DoesNotExist:
+      return Response(status=status.HTTP_404_NOT_FOUND)
