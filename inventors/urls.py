@@ -12,7 +12,8 @@ router.register(r'affiliations', ListAffiliationsView, basename='affiliations')
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('inventor/<str:id>/', GetAffiliationView.as_view({'get': 'list'}), name='inventor-detail'),
+    path('patent/<int:id>/', GetPatentView.as_view({'get': 'list'}), name='patent-detail'),
+    path('inventor/<str:id>/', GetInventorsView.as_view({'get': 'list'}), name='inventor-detail'),
     path('affiliation/<str:id>/', GetAffiliationView.as_view({'get': 'list'}), name='affiliation-detail'),
 ]
 # email=a@email.com&password=hamza

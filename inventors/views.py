@@ -44,7 +44,7 @@ class ListInventorsView(viewsets.ViewSet):
         serializer = InventorSerializer(inventors, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-class GetAffiliationView(viewsets.ViewSet):
+class GetInventorsView(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
     def list(self, request, id=None):
@@ -72,7 +72,7 @@ class GetPatentView(viewsets.ViewSet):
 
     def list(self, request, id=None):
         try:
-            patent = Inventor.objects.get(id=id)
+            patent = Patent.objects.get(id=id)
             serializer = PatentSerializer(patent)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Inventor.DoesNotExist:
