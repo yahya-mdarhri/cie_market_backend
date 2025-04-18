@@ -4,11 +4,11 @@ from rest_framework import serializers
 
 class UserSerializer(serializers.ModelSerializer):
     inventor = InventorSerializer(required=False)
-    # password = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
-        fields = ['email', 'inventor', 'id']
+        fields = ['email', 'inventor', 'id', 'password']
 
     def validate_email(self, value):
         if User.objects.filter(email=value).exists():
