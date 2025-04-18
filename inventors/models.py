@@ -29,7 +29,7 @@ class Inventor(models.Model):
     blank=True,
     related_name='inventors'
   )
-  email = models.EmailField(default=None)
+  email = models.EmailField(default=None,null=True, blank=True)
   image = models.ImageField(upload_to='inventors/images/', default=None, blank=True, null=True)
   orcid = models.CharField(max_length=19, default=None, blank=True, null=True)
   phone_number = models.CharField(max_length=11, blank=True, null=True, default=None)
@@ -101,12 +101,12 @@ class Patent(models.Model):
   title = models.CharField(max_length=255, null=False, blank=False)
   deposit_number = models.BigIntegerField(null=False, unique=True)
   deposit_document = models.CharField(max_length=255, null=False, blank=False) # maybe a file field
-  deposit_date = models.DateField(null=False)
+  deposit_date = models.DateField(null=True, blank=True)
   research_report_document = models.CharField(max_length=255, null=False, blank=False) # maybe a file field
   research_report_result = models.CharField(max_length=1, choices=RESEARCH_REPORT_RESULT, default='A') # Note_1
-  research_report_date = models.DateField(null=False)
+  research_report_date = models.DateField(null=True, blank=True)
   delivery_document = models.CharField(max_length=255, null=False, blank=False) # maybe a file field
-  delivery_date = models.DateField(null=False)
+  delivery_date = models.DateField(null=True, blank=True)
   status = models.CharField(max_length=1, choices=PATENT_STATUS, null=False, default='A') # Note_1
   inventors = models.ManyToManyField(Inventor, related_name='inventors') # no reverse relation
   TRL_level = models.BigIntegerField(null=True, blank=True)
