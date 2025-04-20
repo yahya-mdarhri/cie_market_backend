@@ -42,7 +42,7 @@ class HomeView(viewsets.ViewSet):
         },
         tags=['User'],
     )
-    def list(self, request):
+    def retrieve(self, request):
         user = request.user
         serializer = UserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -147,7 +147,7 @@ class LogoutView(viewsets.ViewSet):
         tags=['Authentication'],
         operation_summary="Login out",
     )
-    def list(self, request):
+    def retrieve(self, request):
         response = Response({"message": "Logged out"})
         response.delete_cookie(settings.AUTH_COOKIE)
         return response

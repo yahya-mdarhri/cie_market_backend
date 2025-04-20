@@ -40,7 +40,7 @@ schema_view = get_schema_view(
 urlpatterns = [
     
     # API endpoints
-    path('', HomeView.as_view({'get': 'list'}), name='home'),
+    path('', HomeView.as_view({'get': 'retrieve'}), name='home'),
     path('api/accounts/', include('accounts.urls')),
     path('api/inventors/', include('inventors.urls')),
 
