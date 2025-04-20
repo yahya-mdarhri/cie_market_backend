@@ -71,7 +71,9 @@ class RegisterView(viewsets.ViewSet):
                 }
             ),
             400: openapi.Response(description="Validation error")
-        }
+        },
+        tags=['Authentication'],
+        operation_summary="Register a new user",
     )
     def create(self, request):
         serializer = UserSerializer(data=request.data)
@@ -87,26 +89,28 @@ class LoginView(viewsets.ViewSet):
 
 
     @swagger_auto_schema(
-    operation_description="Login user and return access + refresh tokens",
-    request_body=openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        required=['email', 'password'],
-        properties={
-            'email': openapi.Schema(type=openapi.TYPE_STRING, format='email'),
-            'password': openapi.Schema(type=openapi.TYPE_STRING, format='password'),
-        },
-    ),
-    responses={
-        200: openapi.Response("Success", schema=openapi.Schema(
+        operation_description="Login user and return access + refresh tokens",
+        request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
+            required=['email', 'password'],
             properties={
-                'message': openapi.Schema(type=openapi.TYPE_STRING),
-                'access_token': openapi.Schema(type=openapi.TYPE_STRING),
-                'refresh_token': openapi.Schema(type=openapi.TYPE_STRING),
-            }
-        )),
-        400: 'Invalid credentials',
-    }
+                'email': openapi.Schema(type=openapi.TYPE_STRING, format='email'),
+                'password': openapi.Schema(type=openapi.TYPE_STRING, format='password'),
+            },
+        ),
+        responses={
+            200: openapi.Response("Success", schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'message': openapi.Schema(type=openapi.TYPE_STRING),
+                    'access_token': openapi.Schema(type=openapi.TYPE_STRING),
+                    'refresh_token': openapi.Schema(type=openapi.TYPE_STRING),
+                }
+            )),
+            400: 'Invalid credentials',
+        },
+        tags=['Authentication'],
+        operation_summary="Login user",
     )
     def create(self, request):
         email = request .data.get('email')
@@ -136,9 +140,11 @@ class LoginView(viewsets.ViewSet):
 class LogoutView(viewsets.ViewSet):
     @swagger_auto_schema(
     operation_description="Logout user by deleting auth cookie",
-    responses={
-        200: openapi.Response(description="Logged out")
-    }
+        responses={
+            200: openapi.Response(description="Logged out")
+        },
+        tags=['Authentication'],
+        operation_summary="Login out",
     )
     def list(self, request):
         response = Response({"message": "Logged out"})
