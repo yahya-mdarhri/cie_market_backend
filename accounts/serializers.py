@@ -16,8 +16,15 @@ class UserSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
+        inventor_data = validated_data.pop('inventor', None)
+        if inventor_data:
+            inventor_serializer = InventorSerializer(data=inventor_data)
+            inventor_serializer.is_valid(raise_exception=True)
+            inventor = inventor_serializer.save()
+            validated_data['inventor'] = inventor
         user = User.objects.create_user(
             email=validated_data.get('email', ''),
-            password=validated_data['password']# hash the password later8
+            password=validated_data['password'],
+            inventor=validated_data.get('inventor'),
         )
         return user

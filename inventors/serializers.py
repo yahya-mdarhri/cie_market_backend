@@ -9,8 +9,6 @@ class AffiliationSerializer(serializers.ModelSerializer):
 
 
 class InventorSerializer(serializers.ModelSerializer):
-  
-    password = serializers.CharField(write_only=True)
     class Meta:
         model = Inventor
         fields = '__all__'
