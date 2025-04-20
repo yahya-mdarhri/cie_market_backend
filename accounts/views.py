@@ -39,7 +39,8 @@ class HomeView(viewsets.ViewSet):
                 schema=UserSerializer()
             ),
             401: 'Unauthorized - User is not authenticated'
-        }
+        },
+        tags=['User'],
     )
     def list(self, request):
         user = request.user

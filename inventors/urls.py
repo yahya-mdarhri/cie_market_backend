@@ -17,7 +17,7 @@ urlpatterns = [
     path ('patents/<str:inv_a>/<str:inv_b>', GetSharedPatentsView.as_view({'get': 'list'}), name='shared-patents'),
     
     path('inventor/co-inventors', GetCoInventorsView.as_view({'get': 'list'}), name='my-coInventors'),
-    path('inventor/<str:id>/', GetInventorsView.as_view({'get': 'list'}), name='inventor-detail'),
+    path('inventor/<str:id>/', GetInventorView.as_view({'get': 'list'}), name='inventor-detail'),
     path('inventor/<str:id>/patents', GetInventorPatentsView.as_view({'get': 'list'}), name='inventor-patents'),
     path('inventor/<str:id>/co-inventors', GetInventorCoInventorsView.as_view({'get': 'list'}), name='inventor-co_inventors'),
 
