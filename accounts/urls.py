@@ -15,5 +15,6 @@ app_name = 'accounts'
 urlpatterns = [
     # path('', include(router.urls)),
     path('login/', LoginView.as_view({'post':'create'}), name='login'),
+    path('register/', RegisterView.as_view({'post':'create'}), name='register'),
     path('logout/', LogoutView.as_view({'get':'retrieve'}), name='logout'),
 ]

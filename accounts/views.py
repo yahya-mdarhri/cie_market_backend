@@ -48,48 +48,39 @@ class HomeView(viewsets.ViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-# view endpoint to register a new user
-# class RegisterView(viewsets.ViewSet):
-#     authentication_classes = []
-#     permission_classes = [AllowAny]
+class RegisterView(viewsets.ViewSet):
+    authentication_classes = []
+    permission_classes = [AllowAny]
 
-#     @swagger_auto_schema(
-#         operation_description="Register a new user with email and password",
-#         request_body=openapi.Schema(
-#             type=openapi.TYPE_OBJECT,
-#             required=['email', 'password', 'inventor'],
-#             properties={
-#                 'email': openapi.Schema(type=openapi.TYPE_STRING, format='email'),
-#                 'password': openapi.Schema(type=openapi.TYPE_STRING, format='password'),
-#                 'inventor': openapi.Schema(type=openapi.TYPE_STRING),
-#             },
-#         ),
-#         responses={
-#             201: openapi.Response(
-#                 description="User registered successfully",
-#                 examples={
-#                     "application/json": {
-#                         "message": "User registered successfully",
-#                         "user": {
-#                             "id": 1,
-#                             "email": "user@example.com",
-#                             "first_name": "John",
-#                             "last_name": "Doe"
-#                         }
-#                     }
-#                 }
-#             ),
-#             400: openapi.Response(description="Validation error")
-#         },
-#         tags=['Authentication'],
-#         operation_summary="Register a new user",
-#     )
-#     def create(self, request):
-#         serializer = UserSerializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response({'message': 'User registered successfully'}, status=status.HTTP_201_CREATED)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    @swagger_auto_schema(
+        operation_description="Register a new user with email and password",
+        request_body=UserSerializer(),
+        responses={
+            201: openapi.Response(
+                description="User registered successfully",
+                examples={
+                    "application/json": {
+                        "message": "User registered successfully",
+                        "user": {
+                            "id": 1,
+                            "email": "user@example.com",
+                            "first_name": "John",
+                            "last_name": "Doe"
+                        }
+                    }
+                }
+            ),
+            400: openapi.Response(description="Validation error")
+        },
+        tags=['Authentication'],
+        operation_summary="Register a new user",
+    )
+    def create(self, request):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'User registered successfully'}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # view endpoint to login a new user
 class LoginView(viewsets.ViewSet):
