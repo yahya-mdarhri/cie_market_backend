@@ -37,12 +37,11 @@ class User(PermissionsMixin, AbstractBaseUser):
   objects = UserManager()
 
   email = models.EmailField(unique=True)
-  inventor = models.ForeignKey(
+  inventor = models.OneToOneField(
     Inventor,
     on_delete=models.CASCADE,
     null=True,
     blank=True,
-    unique=True,
     related_name='+'
   )
   password = models.CharField(max_length=128)
