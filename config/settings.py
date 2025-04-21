@@ -39,7 +39,7 @@ AUTH_USER_MODEL = 'accounts.User'
 
 JWT_SECRET = config('JWT_SECRET')
 JWT_ALGORITHM = config('JWT_ALGORITHM')
-JWT_EXP_DELTA_SECONDS = config("JWT_EXP_DELTA_SECONDS", default=3600000, cast=int)
+JWT_EXP_DELTA_MINUTES = config("JWT_EXP_DELTA_MINUTES", default=60, cast=int)
 
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {
@@ -69,7 +69,7 @@ INSTALLED_APPS = [
 ]
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=JWT_EXP_DELTA_MINUTES),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
 

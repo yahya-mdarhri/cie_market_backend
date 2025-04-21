@@ -18,17 +18,9 @@ class UserSerializer(serializers.ModelSerializer):
 		return value
 
 	def create(self, validated_data):
-		inventor_id = validated_data.pop('inv-id', None)
-		inventor_data = None
-		if inventor_id:
-			try:
-				inventor = Inventor.objects.get(id=inventor_id)
-				inventor_data = InventorSerializer(inventor).data
-			except Inventor.DoesNotExist:
-				raise serializers.ValidationError("Inventor does not exist.")
 		user = User.objects.create_user(
 			email=validated_data.get('email', ''),
 			password=validated_data['password'],
-			inventor=inventor_data,
+			# inventor=inventor_data,
 		)
 		return user
