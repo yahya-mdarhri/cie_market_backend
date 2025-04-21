@@ -39,25 +39,12 @@ AUTH_USER_MODEL = 'accounts.User'
 
 JWT_SECRET = config('JWT_SECRET')
 JWT_ALGORITHM = config('JWT_ALGORITHM')
-JWT_EXP_DELTA_MINUTES = config("JWT_EXP_DELTA_MINUTES", default=60, cast=int)
-
-SWAGGER_SETTINGS = {
-    'SECURITY_DEFINITIONS': {
-        'Bearer': {
-            'type': 'apiKey',
-            'name': 'Authorization',
-            'in': 'header',
-            'description': 'JWT Authorization header. Example: "Bearer <access_token>"',
-        }
-    },
-    'USE_SESSION_AUTH': False,
-}
+JWT_EXP_DELTA_SECONDS = config("JWT_EXP_DELTA_SECONDS", default=3600, cast=int)
 
 INSTALLED_APPS = [
     'accounts',
     'inventors',
 
-    'drf_yasg',
     'rest_framework',
 
     'django.contrib.admin',
@@ -69,7 +56,7 @@ INSTALLED_APPS = [
 ]
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=JWT_EXP_DELTA_MINUTES),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
 

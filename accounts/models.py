@@ -4,8 +4,6 @@ from django.contrib.auth.base_user import AbstractBaseUser,BaseUserManager
 from django.contrib.auth.hashers import make_password
 
 
-from inventors.models import Inventor
-
 class UserManager(BaseUserManager):
 
   def create_user(self, email: str,password: str = None, **extra_fields) -> 'User':
@@ -37,13 +35,6 @@ class User(PermissionsMixin, AbstractBaseUser):
   objects = UserManager()
 
   email = models.EmailField(unique=True)
-  inventor = models.OneToOneField(
-    Inventor,
-    on_delete=models.CASCADE,
-    null=True,
-    blank=True,
-    related_name='+'
-  )
   password = models.CharField(max_length=128)
 
   is_active = models.BooleanField(default=True)
@@ -52,6 +43,3 @@ class User(PermissionsMixin, AbstractBaseUser):
 
   def __str__(self):
       return self.email
-
-  class Meta:
-    db_table = 'users'
