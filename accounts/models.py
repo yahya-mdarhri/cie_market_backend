@@ -42,6 +42,7 @@ class User(PermissionsMixin, AbstractBaseUser):
     on_delete=models.CASCADE,
     null=True,
     blank=True,
+    unique=True,
     related_name='+'
   )
   password = models.CharField(max_length=128)
