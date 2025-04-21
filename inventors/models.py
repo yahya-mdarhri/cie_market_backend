@@ -3,31 +3,43 @@ from django.contrib.postgres.fields import ArrayField
 # Create your models here.
 
 class Affiliation(models.Model):
-    id = models.CharField(primary_key=True, max_length=20)
-    name = models.CharField(max_length=255)
-    parent_id = models.CharField(max_length=20, blank=True, null=True)
+  id = models.CharField(primary_key=True, max_length=20)
+  name = models.CharField(max_length=255, null=False)
+  parent_id = models.CharField(max_length=20, null=True, blank=True)
 
-    # class Meta:
-    #     managed = True
-    #     db_table = 'affiliations'
+  def __str__(self):
+    return self.name
 
+  class Meta:
+    db_table = 'affiliations'
 
 class Inventor(models.Model):
-    id = models.CharField(primary_key=True, max_length=10)
-    preferred_name = models.CharField(max_length=150)
-    name_variants = models.TextField(blank=True, null=True)
-    affiliation = models.CharField(max_length=200, blank=True, null=True)
-    email = models.CharField(unique=True, max_length=150, blank=True, null=True)
-    image = models.CharField(max_length=300, blank=True, null=True)
-    orcid = models.CharField(unique=True, max_length=19, blank=True, null=True)
-    phone = models.CharField(max_length=11, blank=True, null=True)
-    password = models.CharField(max_length=300)
+  id = models.CharField(primary_key=True, max_length=20)
+  preferred_name = models.CharField(max_length=150, null=False)
+  name_variants = ArrayField(
+    models.CharField(max_length=30),
+    blank=True,
+    null=True,
+    default=list,
+  )
+  affiliation = models.ForeignKey(
+    Affiliation,
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True,
+    related_name='inventors'
+  )
+  email = models.EmailField(default=None,null=True, blank=True)
+  image = models.ImageField(upload_to='inventors/images/', default=None, blank=True, null=True)
+  orcid = models.CharField(max_length=19, default=None, blank=True, null=True)
+  phone_number = models.CharField(max_length=11, blank=True, null=True, default=None)
 
-    # class Meta:
-    #     managed = True
-    #     db_table = 'inventors'
-        
-        
+  def __str__(self):
+    return self.preferred_name
+  
+  class Meta:
+    db_table = 'inventors'
+
 class Ticket(models.Model):
   title = models.CharField(max_length=255, null=False)
   summary = models.CharField(max_length=255, null=False)
@@ -44,6 +56,9 @@ class Ticket(models.Model):
   status = models.CharField(max_length=255, null=False)
   meeting_date = models.DateTimeField(null=True, blank=True)
   created_at = models.DateTimeField(auto_now_add=True)
+
+  class Meta:
+    db_table = 'tickets'
 
 class Patent(models.Model):
   RESEARCH_REPORT_RESULT = ( # will be change
@@ -68,7 +83,7 @@ class Patent(models.Model):
     ('D', 'DEVICE'),
     ('E', 'MATERIAL'),
   )
-  SECTOR = {
+  SECTOR = (
     ("A", "Aerospace & Defense"),
     ("B", "Agriculture"),
     ("C", "Automotive & Transportation"),
@@ -81,22 +96,28 @@ class Patent(models.Model):
     ("J", "Information Technology & Software"),
     ("K", "Manufacturing & Industrial Equipment"),
     ("L", "Telecommunications"),
-  }
+  )
 
   title = models.CharField(max_length=255, null=False, blank=False)
   deposit_number = models.BigIntegerField(null=False, unique=True)
   deposit_document = models.CharField(max_length=255, null=False, blank=False) # maybe a file field
-  deposit_date = models.DateField(null=False)
+  deposit_date = models.DateField(null=True, blank=True)
   research_report_document = models.CharField(max_length=255, null=False, blank=False) # maybe a file field
   research_report_result = models.CharField(max_length=1, choices=RESEARCH_REPORT_RESULT, default='A') # Note_1
-  research_report_date = models.DateField(null=False)
+  research_report_date = models.DateField(null=True, blank=True)
   delivery_document = models.CharField(max_length=255, null=False, blank=False) # maybe a file field
-  delivery_date = models.DateField(null=False)
+  delivery_date = models.DateField(null=True, blank=True)
   status = models.CharField(max_length=1, choices=PATENT_STATUS, null=False, default='A') # Note_1
-  inventors = models.ManyToManyField(Inventor, related_name='+') # no reverse relation
+  inventors = models.ManyToManyField(Inventor, related_name='inventors') # no reverse relation
   TRL_level = models.BigIntegerField(null=True, blank=True)
   CRL_level = models.BigIntegerField(null=True, blank=True)
-  affiliation = models.ManyToManyField(Affiliation, related_name='+', blank=True) # no reverse relation
+  affiliation = models.ForeignKey(
+    Affiliation,
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True,
+    related_name='patents'
+  )
   abstract = models.TextField(null=False, blank=False)
   contract_type = models.CharField(max_length=1, choices=CONTRACT_TYPE, null=False, default='A') # Note_1
   sector = models.CharField(max_length=1, choices=SECTOR, null=False, default='A') # Note_1
@@ -107,3 +128,6 @@ class Patent(models.Model):
     blank=True,
     default=list,
   )
+
+  class Meta:
+    db_table = 'patents'

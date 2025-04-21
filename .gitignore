@@ -13,3 +13,5 @@ __pycache__/
 
 # other
 .DS_Store
+**/migrations
+**/migrations/
