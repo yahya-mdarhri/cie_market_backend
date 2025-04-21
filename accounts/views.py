@@ -55,7 +55,15 @@ class RegisterView(viewsets.ViewSet):
 
     @swagger_auto_schema(
         operation_description="Register a new user with email and password",
-        request_body=UserSerializer,
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['email', 'password', 'inv-id'],
+            properties={
+                'email': openapi.Schema(type=openapi.TYPE_STRING, format='email'),
+                'password': openapi.Schema(type=openapi.TYPE_STRING, format='password'),
+                'inv-id': openapi.Schema(type=openapi.TYPE_STRING),
+            },
+        ),
         responses={
             201: openapi.Response(
                 description="User registered successfully",
