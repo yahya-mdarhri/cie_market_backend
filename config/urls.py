@@ -27,7 +27,7 @@ schema_view = get_schema_view(
     openapi.Info(
         title="CIE Inventor Platform API",
         default_version='v1.0',
-        description="API documentation for the CIE Inventors,patents, and affiliations.",
+        description="API documentation for the CIE Inventors, Tickets, Patents, and affiliations.",
         # terms_of_service="https://www.example.com/terms/",
         # contact=openapi.Contact(email="support@example.com"),
         # license=openapi.License(name="BSD License"),

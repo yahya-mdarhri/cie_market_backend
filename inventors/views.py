@@ -348,6 +348,12 @@ class GetTicketView(viewsets.ViewSet):
                 schema=TicketSerializer()
             ),
             401: openapi.Response('Unauthorized'),
+            403: openapi.Response("Has no access to this ticket", schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'error': openapi.Schema(type=openapi.TYPE_STRING),
+                }
+            )),
             404: openapi.Response(description="Ticket not found")
         },
         tags=['Tickets'],
@@ -355,6 +361,8 @@ class GetTicketView(viewsets.ViewSet):
     def retrieve(self, request, id=None):
         try:
             ticket = Ticket.objects.get(id=id)
+            if not ticket.inventors.filter(id=request.user.inventor.id).exists():
+              return Response({"error": "You dont have access to this ticket"},status=status.HTTP_403_FORBIDDEN)
             serializer = TicketSerializer(ticket)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Inventor.DoesNotExist:
