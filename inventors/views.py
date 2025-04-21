@@ -64,7 +64,7 @@ class GetAffiliationView(viewsets.ViewSet):
         },
         tags=['Affiliations'],
     )
-    def list(self, request, id=None):
+    def retrieve(self, request, id=None):
         try:
             affiliation = Affiliation.objects.get(id=id)
             serializer = AffiliationSerializer(affiliation)
@@ -115,7 +115,7 @@ class GetInventorView(viewsets.ViewSet):
         },
         tags=['Inventors'],
     )
-    def list(self, request, id=None):
+    def retrieve(self, request, id=None):
         try: 
             inventor = Inventor.objects.get(id=id)
             serializer = InventorSerializer(inventor)
@@ -170,7 +170,7 @@ class GetPatentView(viewsets.ViewSet):
         },
         tags=['Patents'],
     )
-    def list(self, request, id=None):
+    def retrieve(self, request, id=None):
         try:
             patent = Patent.objects.get(id=id)
             serializer = PatentSerializer(patent)
