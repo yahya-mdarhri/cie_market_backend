@@ -305,3 +305,57 @@ class GetSharedPatentsView(viewsets.ViewSet):
       return Response(serializer.data, status=status.HTTP_200_OK)
     except Inventor.DoesNotExist:
       return Response(status=status.HTTP_404_NOT_FOUND)
+    
+
+class ListTicketsView(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_description="list tickets associated with the authenticated inventor",
+        responses={
+            200: openapi.Response(
+                description="Authenticated User's tickets ",
+                schema=TicketSerializer(many=True)
+            ),
+            401: "Unauthorized"
+        },
+        tags=['Tickets'],
+    )
+    def list(self, request):
+      user = request.user
+      inventor = user.inventor
+      tickets = Ticket.objects.filter(inventors=inventor)
+      serializer = TicketSerializer(tickets, many=True)
+      return Response(serializer.data, status=status.HTTP_200_OK)
+
+class GetTicketView(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_description="Retrieve a ticket by its ID",
+        manual_parameters=[
+            openapi.Parameter(
+                'id',
+                openapi.IN_PATH,
+                description="ID of the ticket",
+                type=openapi.TYPE_STRING,
+                required=True,
+            )
+        ],
+        responses={
+            200: openapi.Response(
+                description="ticket data",
+                schema=TicketSerializer()
+            ),
+            401: openapi.Response('Unauthorized'),
+            404: openapi.Response(description="Ticket not found")
+        },
+        tags=['Tickets'],
+    )
+    def retrieve(self, request, id=None):
+        try:
+            ticket = Ticket.objects.get(id=id)
+            serializer = TicketSerializer(ticket)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Inventor.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
