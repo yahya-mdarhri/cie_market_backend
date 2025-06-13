@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
-# Create your models here.
 
 class Affiliation(models.Model):
   id = models.CharField(primary_key=True, max_length=20)
