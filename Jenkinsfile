@@ -17,14 +17,12 @@ pipeline {
                 script {
                     def dockerExists = sh(script: 'command -v docker || true', returnStdout: true).trim()
                     if (!dockerExists) {
-                        error "❌ Docker is not installed on this Jenkins agent."
+                        error "❌ Docker is not installed on this Jenkins agent. Please install Docker to proceed."
                     }
-
                     def dockerRunning = sh(script: 'docker info > /dev/null 2>&1 || true', returnStatus: true)
                     if (dockerRunning != 0) {
                         error "❌ Docker is installed but not running. Make sure the Docker daemon is active."
                     }
-
                     echo "✅ Docker is installed and running."
                 }
             }
@@ -33,6 +31,13 @@ pipeline {
             steps {
                 script {
                     sh 'docker build -t $IMAGE_NAME:$TAG .'
+                }
+            }
+        }
+        stage('Run Tests') {
+            steps {
+                script {
+                    sh 'echo "Running tests inside the Docker container..."'
                 }
             }
         }

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CIE Market Backend Documentation</title>
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #f8fafc;
+      margin: 0;
+      padding: 0;
+      color: #1a202c;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+    h1, h2, h3 {
+      color: #2d3748;
+      font-weight: 600;
+    }
+    h1 {
+      font-size: 2.25rem;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    h2 {
+      font-size: 1.5rem;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+    h3 {
+      font-size: 1.25rem;
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+    code {
+        background-color: #4a5568;
+      color: whitesmoke;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-family: 'Fira Code', 'Consolas', monospace;
+      font-size: 0.9rem;
+    }
+    pre {
+      background-color: #2d3748;
+      color: #e2e8f0;
+      padding: 1rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-family: 'Fira Code', 'Consolas', monospace;
+      font-size: 0.9rem;
+      margin: 1rem 0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    ul {
+      padding-left: 1.5rem;
+      margin: 0.5rem 0;
+    }
+    li {
+      margin-bottom: 0.5rem;
+    }
+    section {
+      margin-bottom: 2.5rem;
+    }
+    .tag {
+      display: inline-block;
+      background-color: #e2e8f0;
+      color: #4a5568;
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-bottom: 1rem;
+    }
+    img {
+      max-width: 100%;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      margin: 1rem 0;
+    }
+    p {
+      margin: 0.75rem 0;
+    }
+    a {
+      color: #3182ce;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    a:hover {
+      color: #2b6cb0;
+      text-decoration: underline;
+    }
+    .toc {
+      background-color: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 1rem;
+      margin-bottom: 2rem;
+    }
+    .toc h3 {
+      margin-top: 0;
+      font-size: 1.1rem;
+    }
+    .toc ul {
+      list-style: none;
+      padding: 0;
+    }
+    .toc li {
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>CIE Market Backend Documentation</h1>
+    <p>This documentation describes the architecture and functionality of the CIE Market Backend, including its Docker, Jenkins, and modular structure setup.</p>
+
+    <div class="toc">
+      <h3>Table of Contents</h3>
+      <ul>
+        <li><a href="#overview">1. Project Overview</a></li>
+        <li><a href="#structure">2. Directory Structure</a></li>
+        <li><a href="#modules">3. App Modules</a></li>
+        <li><a href="#cicd">4. CI/CD with Jenkins</a></li>
+        <li><a href="#running">5. Running the Project</a></li>
+        <li><a href="#docker">6. Docker Support</a></li>
+        <li><a href="#pipeline">7. Jenkins Pipeline Setup</a></li>
+        <li><a href="#requirements">8. Requirements</a></li>
+      </ul>
+    </div>
+
+    <section id="overview">
+      <h2>1. Project Overview</h2>
+      <p>This is a Django web application structured with reusable apps: <code>accounts</code> and <code>inventors</code>. It supports authentication, user management, and inventory functionality.</p>
+    </section>
+
+    <section id="structure">
+      <h2>2. Directory Structure</h2>
+      <pre><code>.
+├── accounts/
+├── config/
+├── inventors/
+├── jenkins_service/
+├── Jenkinsfile
+├── Makefile
+├── manage.py
+├── requirements.txt
+</code></pre>
+      <ul>
+        <li><strong>accounts/</strong>: Authentication and user management logic</li>
+        <li><strong>config/</strong>: Core Django configuration (settings, routing, WSGI/ASGI)</li>
+        <li><strong>inventors/</strong>: Domain-specific logic and models</li>
+        <li><strong>jenkins_service/</strong>: Jenkins-Docker integration setup</li>
+        <li><strong>Jenkinsfile</strong>: Jenkins CI pipeline definition</li>
+        <li><strong>Makefile</strong>: CLI automation for common tasks (e.g., test, build)</li>
+        <li><strong>manage.py</strong>: Django’s CLI entry point</li>
+        <li><strong>requirements.txt</strong>: Python dependencies</li>
+      </ul>
+    </section>
+
+    <section id="modules">
+      <h2>3. App Modules</h2>
+
+      <h3>accounts/</h3>
+      <ul>
+        <li><code>models.py</code>: Custom user model or profile extension</li>
+        <li><code>authentication.py</code>: Token/session management</li>
+        <li><code>serializers.py</code>: DRF serializers for user data</li>
+        <li><code>views.py</code>: Views for login, signup, etc.</li>
+        <li><code>urls.py</code>: Routing for account endpoints</li>
+        <li><code>utils.py</code>: Reusable helper functions</li>
+      </ul>
+
+      <h3>inventors/</h3>
+      <ul>
+        <li><code>models.py</code>: Inventory models or objects related to invention</li>
+        <li><code>serializers.py</code>: DRF serializers for inventory</li>
+        <li><code>views.py</code>: API views or class-based views</li>
+        <li><code>urls.py</code>: Routing for inventory-related endpoints</li>
+      </ul>
+
+      <h3>config/</h3>
+      <ul>
+        <li><code>settings.py</code>: Project-wide settings including apps, DB, REST, etc.</li>
+        <li><code>urls.py</code>: Root-level routing combining all app URLs</li>
+        <li><code>wsgi.py</code>: WSGI entrypoint for deployment</li>
+        <li><code>asgi.py</code>: ASGI entrypoint for async services</li>
+      </ul>
+    </section>
+
+    <section id="cicd">
+      <h2>4. CI/CD with Jenkins</h2>
+      <span class="tag">jenkins_service/</span>
+      <ul>
+        <li><code>dockerfile</code>: Jenkins + Docker setup</li>
+        <li><code>entrypoint.sh</code>: Ensures correct Docker socket permissions inside Jenkins container</li>
+        <li><code>script.sh</code>: Script to build and run Jenkins container</li>
+        <li><code>docs.html</code>: HTML docs for Jenkins setup</li>
+      </ul>
+
+      <h3>Jenkinsfile</h3>
+      <p>Defines your CI stages such as:</p>
+      <ul>
+        <li>Installing dependencies</li>
+        <li>Running unit tests</li>
+        <li>Linting</li>
+        <li>Docker image build (optional)</li>
+      </ul>
+    </section>
+
+    <section id="running">
+      <h2>5. Running the Project</h2>
+      <h3>Install Dependencies</h3>
+      <pre><code>pip install -r requirements.txt</code></pre>
+
+      <h3>Run Development Server</h3>
+      <pre><code>python manage.py runserver</code></pre>
+
+      <h3>Apply Migrations</h3>
+      <pre><code>python manage.py makemigrations
+python manage.py migrate</code></pre>
+
+      <h3>Run Tests</h3>
+      <pre><code>python manage.py test</code></pre>
+    </section>
+
+    <section id="docker">
+      <h2>6. Docker Support</h2>
+      <p>Docker is used to run Jenkins with access to the host Docker daemon for container builds.</p>
+
+      <h3>Build Jenkins Docker Image</h3>
+      <pre><code>cd jenkins_service
+docker build -t jenkins-docker .</code></pre>
+
+      <h3>Run Jenkins Container</h3>
+      <pre><code>docker run -d \
+  --name jenkins-server \
+  -p 8080:8080 -p 50000:50000 \
+  -v jenkins_home:/var/jenkins_home \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  jenkins-docker</code></pre>
+    </section>
+
+    <section id="pipeline">
+      <h2>7. Jenkins Pipeline Setup</h2>
+      <p>this  <code>image.png</code> is the first schema of jenkins pipeline</p>
+      <img src="./image.png" alt="Project Preview" />
+      <a href="./jenkins_service/docs.html">View Jenkins Service Documentation</a>
+    </section>
+
+    <section id="requirements">
+      <h2>8. Requirements</h2>
+      <p>List of Python dependencies:</p>
+      <pre><code># requirements.txt
+Django>=3.2
+djangorestframework
+# ... more as needed
+</code></pre>
+    </section>
+  </div>
+</body>
+</html>

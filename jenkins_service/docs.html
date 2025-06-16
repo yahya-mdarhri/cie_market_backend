@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Jenkins with Docker Inside</title>
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #f8fafc;
+      margin: 0;
+      padding: 0;
+      color: #1a202c;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+    h1, h2 {
+      color: #2d3748;
+      font-weight: 600;
+    }
+    h1 {
+      font-size: 2.25rem;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    h2 {
+      font-size: 1.5rem;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+    code {
+      background-color: #edf2f7;
+      color: #2d3748;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-family: 'Fira Code', 'Consolas', monospace;
+      font-size: 0.9rem;
+    }
+    pre {
+      background-color: #2d3748;
+      color: #e2e8f0;
+      padding: 1rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-family: 'Fira Code', 'Consolas', monospace;
+      font-size: 0.9rem;
+      margin: 1rem 0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    ul {
+      padding-left: 1.5rem;
+      margin: 0.5rem 0;
+    }
+    li {
+      margin-bottom: 0.5rem;
+    }
+    section {
+      margin-bottom: 2.5rem;
+    }
+    .tag {
+      display: inline-block;
+      background-color: #e2e8f0;
+      color: #4a5568;
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-bottom: 1rem;
+    }
+    p {
+      margin: 0.75rem 0;
+    }
+    a {
+      color: #3182ce;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    a:hover {
+      color: #2b6cb0;
+      text-decoration: underline;
+    }
+    .toc {
+      background-color: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 1rem;
+      margin-bottom: 2rem;
+    }
+    .toc h3 {
+      margin-top: 0;
+      font-size: 1.1rem;
+    }
+    .toc ul {
+      list-style: none;
+      padding: 0;
+    }
+    .toc li {
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Jenkins with Docker Inside</h1>
+    <p>This documentation explains how to build a custom Jenkins container with Docker pre-installed and usable from Jenkins pipelines using the host Docker daemon.</p>
+
+    <div class="toc">
+      <h3>Table of Contents</h3>
+      <ul>
+        <li><a href="#dockerfile">1. Dockerfile</a></li>
+        <li><a href="#entrypoint">2. Entrypoint Script</a></li>
+        <li><a href="#build-run">3. Build and Run Commands</a></li>
+        <li><a href="#notes">4. Notes</a></li>
+      </ul>
+    </div>
+
+    <section id="dockerfile">
+      <h2>1. Dockerfile</h2>
+      <span class="tag">Dockerfile</span>
+      <p>Base image: <code>jenkins/jenkins:lts</code>. Adds Docker and gosu, sets the proper group for Docker socket access.</p>
+      <pre><code>FROM jenkins/jenkins:lts
+
+USER root
+
+RUN apt-get update && \
+    apt-get install -y docker.io && \
+    usermod -aG docker jenkins && \
+    apt-get install -y gosu 
+
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]</code></pre>
+    </section>
+
+    <section id="entrypoint">
+      <h2>2. Entrypoint Script</h2>
+      <span class="tag">entrypoint.sh</span>
+      <p>Dynamically adds Jenkins user to the same group as the Docker socket to allow containerized Jenkins to access host Docker daemon.</p>
+      <pre><code>#!/bin/bash
+set -e
+
+DOCKER_SOCK="/var/run/docker.sock"
+if [ -S ${DOCKER_SOCK} ]; then
+    DOCKER_GID=$(stat -c %g ${DOCKER_SOCK})
+    
+    if getent group ${DOCKER_GID} >/dev/null; then
+        existing_group=$(getent group ${DOCKER_GID} | cut -d: -f1)
+        if [ "${existing_group}" != "docker" ]; then
+            usermod -aG ${existing_group} jenkins
+        fi
+    else
+        groupadd -g ${DOCKER_GID} docker_host
+        usermod -aG docker_host jenkins
+    fi
+fi
+
+exec gosu jenkins /usr/local/bin/jenkins.sh "$@"</code></pre>
+    </section>
+
+    <section id="build-run">
+      <h2>3. Build and Run Commands</h2>
+      <span class="tag">script.sh</span>
+      <p>Build and run Jenkins container with Docker access.</p>
+      <pre><code>docker build -t jenkins-docker .
+
+docker run -d \
+  --name jenkins-server \
+  -p 8080:8080 \
+  -p 50000:50000 \
+  -v jenkins_home:/var/jenkins_home \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  jenkins-docker</code></pre>
+      <ul>
+        <li><code>-v /var/run/docker.sock</code>: Gives access to host Docker daemon.</li>
+        <li><code>gosu</code>: Runs Jenkins as a non-root user inside container.</li>
+      </ul>
+    </section>
+
+    <section id="notes">
+      <h2>4. Notes</h2>
+      <ul>
+        <li>Ensure Docker is installed on your host machine.</li>
+        <li>This setup enables Jenkins to build Docker images and run containers.</li>
+        <li>Using <code>gosu</code> avoids root execution for security.</li>
+      </ul>
+    </section>
+  </div>
+</body>
+</html>
