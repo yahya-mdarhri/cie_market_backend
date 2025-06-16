@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
 
-# Handle Docker socket permissions
 DOCKER_SOCK="/var/run/docker.sock"
 if [ -S ${DOCKER_SOCK} ]; then
     DOCKER_GID=$(stat -c %g ${DOCKER_SOCK})
