@@ -15,6 +15,4 @@ if [ -S ${DOCKER_SOCK} ]; then
         usermod -aG docker_host jenkins
     fi
 fi
-
-
 exec gosu jenkins /usr/local/bin/jenkins.sh "$@"
