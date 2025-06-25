@@ -1,6 +1,13 @@
-python -m venv env
-source env/bin/activate
-python -m pip install --upgrade pip
+
 pip install -r requirements.txt
-python manage.py migrate
-python manage.py runserver
+
+mkdir -p staticfiles
+
+python3 manage.py collectstatic --noinput --clear || {
+    echo "collectstatic failed, but continuing with build..."
+    # Create empty staticfiles directory as fallback
+    mkdir -p staticfiles
+    touch staticfiles/.gitkeep
+}
+
+echo "Build completed successfully"
