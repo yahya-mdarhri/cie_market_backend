@@ -1,5 +1,7 @@
-
+from config import settings
+from config.pagination import Paginator
 from rest_framework.views import APIView
+
 from rest_framework.permissions import (
     AllowAny,
     IsAuthenticated,
@@ -88,7 +90,9 @@ class ListInventorsView(viewsets.ViewSet):
     )
     def list(self, request):
         inventors = Inventor.objects.all()
-        serializer = InventorSerializer(inventors, many=True)
+        paginator = Paginator()
+        results = paginator.paginate_queryset(inventors, request)
+        serializer = InventorSerializer(results, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class GetInventorView(viewsets.ViewSet):
@@ -324,9 +328,30 @@ class ListTicketsView(viewsets.ViewSet):
     def list(self, request):
       user = request.user
       inventor = user.inventor
-      tickets = Ticket.objects.filter(inventors=inventor)
+      tickets = Ticket.objects.filter(inventors=inventor, is_draft=False)
       serializer = TicketSerializer(tickets, many=True)
       return Response(serializer.data, status=status.HTTP_200_OK)
+
+class ListDraftTicketsView(viewsets.ViewSet):
+		permission_classes = [IsAuthenticated]
+
+		@swagger_auto_schema(
+				operation_description="list draft tickets associated with the authenticated inventor",
+				responses={
+						200: openapi.Response(
+								description="Authenticated User's draft tickets ",
+								schema=TicketSerializer(many=True)
+						),
+						401: "Unauthorized"
+				},
+				tags=['Tickets'],
+		)
+		def list(self, request):
+			user = request.user
+			inventor = user.inventor
+			tickets = Ticket.objects.filter(inventors=inventor, is_draft=True)
+			serializer = TicketSerializer(tickets, many=True)
+			return Response(serializer.data, status=status.HTTP_200_OK)
 
 class GetTicketView(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
@@ -367,3 +392,119 @@ class GetTicketView(viewsets.ViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Inventor.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+          
+          
+    @swagger_auto_schema(
+        operation_description="Update a ticket by its ID",  
+        request_body=TicketSerializer,
+        responses={
+            200: openapi.Response(
+                description="Ticket updated successfully",
+                schema=TicketSerializer()
+            ),
+            400: openapi.Response(
+                description="Invalid data provided",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'error': openapi.Schema(type=openapi.TYPE_STRING),
+                    }
+                )
+            ),
+            401: "Unauthorized",
+            403: "Forbidden"
+        },
+        tags=['Tickets'],
+    )
+    def update(self, request, id=None):
+        try:
+            ticket = Ticket.objects.get(id=id)
+            if not ticket.inventors.filter(id=request.user.inventor.id).exists():
+                return Response({"error": "You dont have access to this ticket"}, status=status.HTTP_403_FORBIDDEN)
+            serializer = TicketSerializer(ticket, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Ticket.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+          
+    @swagger_auto_schema(
+        operation_description="Delete a ticket by its ID",
+        responses={
+            204: openapi.Response("Ticket deleted successfully"),
+            404: openapi.Response("Ticket not found"),
+            403: openapi.Response("You dont have access to this ticket")
+        },
+        tags=['Tickets'],
+    )
+    def destroy(self, request, id=None):
+        try:
+            ticket = Ticket.objects.get(id=id)
+            if not ticket.inventors.filter(id=request.user.inventor.id).exists():
+                return Response({"error": "You dont have access to this ticket"}, status=status.HTTP_403_FORBIDDEN)
+            ticket.delete()
+            return Response({"message": "Ticket deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+        except Ticket.DoesNotExist:
+            return Response({"error": "Ticket not found"}, status=status.HTTP_404_NOT_FOUND)
+
+class CreateTicketView(viewsets.ViewSet):
+		permission_classes = [IsAuthenticated]
+
+		@swagger_auto_schema(
+				operation_description="Create a new ticket",
+				request_body=TicketSerializer,
+				responses={
+						201: openapi.Response(
+								description="Ticket created successfully",
+								schema=TicketSerializer()
+						),
+						400: openapi.Response(
+								description="Invalid data provided",
+								schema=openapi.Schema(
+										type=openapi.TYPE_OBJECT,
+										properties={
+												'error': openapi.Schema(type=openapi.TYPE_STRING),
+										}
+								)
+						),
+						401: "Unauthorized"
+				},
+				tags=['Tickets'],
+		)
+		def create(self, request):
+				serializer = TicketSerializer(data=request.data)
+				if serializer.is_valid():
+						serializer.save()
+						return Response(serializer.data, status=status.HTTP_201_CREATED)
+				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class SearchInventorByNameView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_description="Search inventors by name (case-insensitive)",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['name'],
+            properties={
+                'name': openapi.Schema(type=openapi.TYPE_STRING, description='Name or part of the name to search for')
+            }
+        ),
+        responses={
+            200: openapi.Response(
+                description="List of matching inventors",
+                schema=InventorSerializer(many=True)
+            ),
+            400: "Missing or invalid 'name' in request body",
+            401: "Unauthorized"
+        },
+        tags=['Inventors'],
+    )
+    def post(self, request):
+        name_query = request.data.get('name', None)
+        if not name_query:
+            return Response({"error": "Missing 'name' in request body"}, status=status.HTTP_400_BAD_REQUEST)
+        inventors = Inventor.objects.filter(preferred_name__icontains=name_query)
+        serializer = InventorSerializer(inventors, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

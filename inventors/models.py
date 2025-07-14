@@ -55,6 +55,7 @@ class Ticket(models.Model):
   status = models.CharField(max_length=255, null=False)
   meeting_date = models.DateTimeField(null=True, blank=True)
   created_at = models.DateTimeField(auto_now_add=True)
+  is_draft = models.BooleanField(default=True)
 
   class Meta:
     db_table = 'tickets'
