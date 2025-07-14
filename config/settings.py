@@ -44,9 +44,19 @@ CORS_ALLOWED_ORIGINS = [
 # Application definition
 
 AUTH_COOKIE = 'access_token'
-
 AUTH_USER_MODEL = 'accounts.User'
 
+# Email Configuration
+EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
+EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
+EMAIL_PORT = config('EMAIL_PORT', default=587)
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
+EMAIL_USE_SSL = config('EMAIL_USE_SSL', default=False, cast=bool)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+# JWT Configuration
 JWT_SECRET = config('JWT_SECRET')
 JWT_ALGORITHM = config('JWT_ALGORITHM')
 JWT_EXP_DELTA_MINUTES = config("JWT_EXP_DELTA_MINUTES", default=60, cast=int)
@@ -68,6 +78,7 @@ INSTALLED_APPS = [
     'inventors',
 
     'drf_yasg',
+    'corsheaders',
     'rest_framework',
 
     'django.contrib.admin',
