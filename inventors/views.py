@@ -28,6 +28,7 @@ class ListAffiliationsView(viewsets.ViewSet):
 
     @swagger_auto_schema(
         operation_description="Retrieve a list of all affiliations",
+        manual_parameters=Paginator.PARAMETERS_DOCS,
         responses={
             200: openapi.Response(
                 description="Array of affiliations",
@@ -39,8 +40,10 @@ class ListAffiliationsView(viewsets.ViewSet):
     )
     def list(self, request):
         affiliations = Affiliation.objects.all()
-        serializer = AffiliationSerializer(affiliations, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        paginator = Paginator()
+        results = paginator.paginate_queryset(affiliations, request)
+        serializer = AffiliationSerializer(results, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
 class GetAffiliationView(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
@@ -79,6 +82,7 @@ class ListInventorsView(viewsets.ViewSet):
 
     @swagger_auto_schema(
         operation_description="Retrieve a list of all inventors",
+        manual_parameters=Paginator.PARAMETERS_DOCS,
         responses={
             200: openapi.Response(
                 description="Array of Inventors",
@@ -93,7 +97,7 @@ class ListInventorsView(viewsets.ViewSet):
         paginator = Paginator()
         results = paginator.paginate_queryset(inventors, request)
         serializer = InventorSerializer(results, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return paginator.get_paginated_response(serializer.data)
 
 class GetInventorView(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
@@ -134,6 +138,7 @@ class ListPatentsView(viewsets.ViewSet):
 
     @swagger_auto_schema(
         operation_description="Retrieve patents associated with the authenticated inventor",
+        manual_parameters=Paginator.PARAMETERS_DOCS,
         responses={
             200: openapi.Response(
                 description="Authenticated User's patents ",
@@ -147,8 +152,10 @@ class ListPatentsView(viewsets.ViewSet):
       user = request.user
       inventor = user.inventor
       patents = Patent.objects.filter(inventors=inventor)
-      serializer = PatentSerializer(patents, many=True)
-      return Response(serializer.data, status=status.HTTP_200_OK)
+      paginator = Paginator()
+      results = paginator.paginate_queryset(patents, request)
+      serializer = PatentSerializer(results, many=True)
+      return paginator.get_paginated_response(serializer.data)
 
 class GetPatentView(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
@@ -194,15 +201,17 @@ class GetInventorPatentsView(viewsets.ViewSet):
         },
         manual_parameters=[
             openapi.Parameter('id', openapi.IN_PATH, description="ID of the inventor", type=openapi.TYPE_STRING)
-        ],
+        ] + Paginator.PARAMETERS_DOCS,
         tags=['Patents'],
     )
     def list(self, request, id=None):
         try:
             inventor = Inventor.objects.get(id=id)
             patents = Patent.objects.filter(inventors=inventor)
-            serializer = PatentSerializer(patents, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            paginator = Paginator()
+            results = paginator.paginate_queryset(patents, request)
+            serializer = PatentSerializer(results, many=True)
+            return paginator.get_paginated_response(serializer.data)
         except Inventor.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -218,15 +227,17 @@ class GetAffiliationPatentsView(viewsets.ViewSet):
       },
       manual_parameters=[
           openapi.Parameter('id', openapi.IN_PATH, description="ID of the affiliation", type=openapi.TYPE_STRING)
-      ],
+      ] + Paginator.PARAMETERS_DOCS,
       tags=['Patents'],
   )
   def list(self, request, id=None):
     try:
       affiliation = Affiliation.objects.get(id=id.upper())
       patents = Patent.objects.filter(affiliation=affiliation)
-      serializer = PatentSerializer(patents, many=True)
-      return Response(serializer.data, status=status.HTTP_200_OK)
+      paginator = Paginator()
+      results = paginator.paginate_queryset(patents, request)
+      serializer = PatentSerializer(results, many=True)
+      return paginator.get_paginated_response(serializer.data)
     except Affiliation.DoesNotExist:
       return Response(status=status.HTTP_404_NOT_FOUND)
     
@@ -235,6 +246,7 @@ class GetCoInventorsView(viewsets.ViewSet):
 
   @swagger_auto_schema(
       operation_description="Get the list of co-inventors for the patents associated with the current user.",
+      manual_parameters=Paginator.PARAMETERS_DOCS,
       responses={
           200: InventorSerializer(many=True),
           404: openapi.Response('Inventor not found'),
@@ -250,8 +262,10 @@ class GetCoInventorsView(viewsets.ViewSet):
       co_inventors = set()
       for patent in patents:
         co_inventors.update(patent.inventors.exclude(id=inventor.id))
-      serializer = InventorSerializer(co_inventors, many=True)
-      return Response(serializer.data, status=status.HTTP_200_OK)
+      paginator = Paginator()
+      results = paginator.paginate_queryset(co_inventors, request)
+      serializer = InventorSerializer(results, many=True)
+      return paginator.get_paginated_response(serializer.data)
     except Inventor.DoesNotExist:
       return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -267,7 +281,7 @@ class GetInventorCoInventorsView(viewsets.ViewSet):
       },
       manual_parameters=[
           openapi.Parameter('id', openapi.IN_PATH, description="ID of the inventor", type=openapi.TYPE_STRING)
-      ],
+      ] + Paginator.PARAMETERS_DOCS,
       tags=['Inventors'],
   )
   def list(self, request, id=None):
@@ -277,8 +291,10 @@ class GetInventorCoInventorsView(viewsets.ViewSet):
       co_inventors = set()
       for patent in patents:
         co_inventors.update(patent.inventors.exclude(id=id))
-      serializer = InventorSerializer(co_inventors, many=True)
-      return Response(serializer.data, status=status.HTTP_200_OK)
+      paginator = Paginator()
+      results = paginator.paginate_queryset(co_inventors, request)
+      serializer = InventorSerializer(results, many=True)
+      return paginator.get_paginated_response(serializer.data)
     except Inventor.DoesNotExist:
       return Response(status=status.HTTP_404_NOT_FOUND)
     
@@ -297,7 +313,7 @@ class GetSharedPatentsView(viewsets.ViewSet):
       manual_parameters=[
           openapi.Parameter('inv_a', openapi.IN_PATH, description="ID of the first inventor", type=openapi.TYPE_STRING),
           openapi.Parameter('inv_b', openapi.IN_PATH, description="ID of the second inventor", type=openapi.TYPE_STRING)
-      ],
+      ] + Paginator.PARAMETERS_DOCS,
       tags=['Patents'],
   )
   def list(self, request, inv_a=None, inv_b=None):
@@ -305,8 +321,10 @@ class GetSharedPatentsView(viewsets.ViewSet):
       inventor_a = Inventor.objects.get(id=inv_a)
       inventor_b = Inventor.objects.get(id=inv_b)
       patents = Patent.objects.filter(inventors=inventor_a).filter(inventors=inventor_b)
-      serializer = PatentSerializer(patents, many=True)
-      return Response(serializer.data, status=status.HTTP_200_OK)
+      paginator = Paginator()
+      results = paginator.paginate_queryset(patents, request)
+      serializer = PatentSerializer(results, many=True)
+      return paginator.get_paginated_response(serializer.data)
     except Inventor.DoesNotExist:
       return Response(status=status.HTTP_404_NOT_FOUND)
     
@@ -316,6 +334,7 @@ class ListTicketsView(viewsets.ViewSet):
 
     @swagger_auto_schema(
         operation_description="list tickets associated with the authenticated inventor",
+        manual_parameters=Paginator.PARAMETERS_DOCS,
         responses={
             200: openapi.Response(
                 description="Authenticated User's tickets ",
@@ -329,14 +348,17 @@ class ListTicketsView(viewsets.ViewSet):
       user = request.user
       inventor = user.inventor
       tickets = Ticket.objects.filter(inventors=inventor, is_draft=False)
-      serializer = TicketSerializer(tickets, many=True)
-      return Response(serializer.data, status=status.HTTP_200_OK)
+      paginator = Paginator()
+      results = paginator.paginate_queryset(tickets, request)
+      serializer = TicketSerializer(results, many=True)
+      return paginator.get_paginated_response(serializer.data)
 
 class ListDraftTicketsView(viewsets.ViewSet):
 		permission_classes = [IsAuthenticated]
 
 		@swagger_auto_schema(
 				operation_description="list draft tickets associated with the authenticated inventor",
+				manual_parameters=Paginator.PARAMETERS_DOCS,
 				responses={
 						200: openapi.Response(
 								description="Authenticated User's draft tickets ",
@@ -349,9 +371,11 @@ class ListDraftTicketsView(viewsets.ViewSet):
 		def list(self, request):
 			user = request.user
 			inventor = user.inventor
+			paginator = Paginator()
 			tickets = Ticket.objects.filter(inventors=inventor, is_draft=True)
-			serializer = TicketSerializer(tickets, many=True)
-			return Response(serializer.data, status=status.HTTP_200_OK)
+			results = paginator.paginate_queryset(tickets, request)
+			serializer = TicketSerializer(results, many=True)
+			return paginator.get_paginated_response(serializer.data)
 
 class GetTicketView(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
@@ -484,6 +508,7 @@ class SearchInventorByNameView(APIView):
 
     @swagger_auto_schema(
         operation_description="Search inventors by name (case-insensitive)",
+        manual_parameters=Paginator.PARAMETERS_DOCS,
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             required=['name'],
@@ -497,6 +522,7 @@ class SearchInventorByNameView(APIView):
                 schema=InventorSerializer(many=True)
             ),
             400: "Missing or invalid 'name' in request body",
+            404: "No inventors found matching the name",
             401: "Unauthorized"
         },
         tags=['Inventors'],
@@ -506,5 +532,9 @@ class SearchInventorByNameView(APIView):
         if not name_query:
             return Response({"error": "Missing 'name' in request body"}, status=status.HTTP_400_BAD_REQUEST)
         inventors = Inventor.objects.filter(preferred_name__icontains=name_query)
-        serializer = InventorSerializer(inventors, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        paginator = Paginator()
+        results = paginator.paginate_queryset(inventors, request)
+        if not results:
+            return Response({"message": "No inventors found matching the query"}, status=status.HTTP_404_NOT_FOUND)
+        serializer = InventorSerializer(results, many=True)
+        return paginator.get_paginated_response(serializer.data)
