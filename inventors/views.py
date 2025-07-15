@@ -498,6 +498,11 @@ class CreateTicketView(viewsets.ViewSet):
 		)
 		def create(self, request):
 				serializer = TicketSerializer(data=request.data)
+				# Ensure the authenticated user is added as an inventor to the ticket
+				if not 'inventors' in request.data:
+					request.data['inventors'] = [request.user.inventor.id]
+				else:
+					request.data['inventors'].append(request.user.inventor.id)
 				if serializer.is_valid():
 						serializer.save()
 						return Response(serializer.data, status=status.HTTP_201_CREATED)
