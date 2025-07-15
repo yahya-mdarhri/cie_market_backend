@@ -39,7 +39,7 @@ class ListAffiliationsView(viewsets.ViewSet):
         tags=['Affiliations'],
     )
     def list(self, request):
-        affiliations = Affiliation.objects.all()
+        affiliations = Affiliation.objects.all().order_by('id')
         paginator = Paginator()
         results = paginator.paginate_queryset(affiliations, request)
         serializer = AffiliationSerializer(results, many=True)
@@ -93,7 +93,7 @@ class ListInventorsView(viewsets.ViewSet):
         tags=['Inventors'],
     )
     def list(self, request):
-        inventors = Inventor.objects.all()
+        inventors = Inventor.objects.all().order_by('id')
         paginator = Paginator()
         results = paginator.paginate_queryset(inventors, request)
         serializer = InventorSerializer(results, many=True)
@@ -151,7 +151,7 @@ class ListPatentsView(viewsets.ViewSet):
     def list(self, request):
       user = request.user
       inventor = user.inventor
-      patents = Patent.objects.filter(inventors=inventor)
+      patents = Patent.objects.filter(inventors=inventor).order_by('id')
       paginator = Paginator()
       results = paginator.paginate_queryset(patents, request)
       serializer = PatentSerializer(results, many=True)
@@ -207,7 +207,7 @@ class GetInventorPatentsView(viewsets.ViewSet):
     def list(self, request, id=None):
         try:
             inventor = Inventor.objects.get(id=id)
-            patents = Patent.objects.filter(inventors=inventor)
+            patents = Patent.objects.filter(inventors=inventor).order_by('id')
             paginator = Paginator()
             results = paginator.paginate_queryset(patents, request)
             serializer = PatentSerializer(results, many=True)
@@ -233,7 +233,7 @@ class GetAffiliationPatentsView(viewsets.ViewSet):
   def list(self, request, id=None):
     try:
       affiliation = Affiliation.objects.get(id=id.upper())
-      patents = Patent.objects.filter(affiliation=affiliation)
+      patents = Patent.objects.filter(affiliation=affiliation).order_by('id')
       paginator = Paginator()
       results = paginator.paginate_queryset(patents, request)
       serializer = PatentSerializer(results, many=True)
@@ -258,7 +258,7 @@ class GetCoInventorsView(viewsets.ViewSet):
     user = request.user
     try:
       inventor = user.inventor
-      patents = Patent.objects.filter(inventors=inventor)
+      patents = Patent.objects.filter(inventors=inventor).order_by('id')
       co_inventors = set()
       for patent in patents:
         co_inventors.update(patent.inventors.exclude(id=inventor.id))
@@ -287,7 +287,7 @@ class GetInventorCoInventorsView(viewsets.ViewSet):
   def list(self, request, id=None):
     try:
       inventor = Inventor.objects.get(id=id)
-      patents = Patent.objects.filter(inventors=inventor)
+      patents = Patent.objects.filter(inventors=inventor).order_by('id')
       co_inventors = set()
       for patent in patents:
         co_inventors.update(patent.inventors.exclude(id=id))
@@ -320,7 +320,7 @@ class GetSharedPatentsView(viewsets.ViewSet):
     try:
       inventor_a = Inventor.objects.get(id=inv_a)
       inventor_b = Inventor.objects.get(id=inv_b)
-      patents = Patent.objects.filter(inventors=inventor_a).filter(inventors=inventor_b)
+      patents = Patent.objects.filter(inventors=inventor_a).filter(inventors=inventor_b).order_by('id')
       paginator = Paginator()
       results = paginator.paginate_queryset(patents, request)
       serializer = PatentSerializer(results, many=True)
@@ -347,7 +347,7 @@ class ListTicketsView(viewsets.ViewSet):
     def list(self, request):
       user = request.user
       inventor = user.inventor
-      tickets = Ticket.objects.filter(inventors=inventor, is_draft=False)
+      tickets = Ticket.objects.filter(inventors=inventor, is_draft=False).order_by('id')
       paginator = Paginator()
       results = paginator.paginate_queryset(tickets, request)
       serializer = TicketSerializer(results, many=True)
@@ -372,7 +372,7 @@ class ListDraftTicketsView(viewsets.ViewSet):
 			user = request.user
 			inventor = user.inventor
 			paginator = Paginator()
-			tickets = Ticket.objects.filter(inventors=inventor, is_draft=True)
+			tickets = Ticket.objects.filter(inventors=inventor, is_draft=True).order_by('id')
 			results = paginator.paginate_queryset(tickets, request)
 			serializer = TicketSerializer(results, many=True)
 			return paginator.get_paginated_response(serializer.data)
@@ -536,7 +536,7 @@ class SearchInventorByNameView(APIView):
         name_query = request.data.get('name', None)
         if not name_query:
             return Response({"error": "Missing 'name' in request body"}, status=status.HTTP_400_BAD_REQUEST)
-        inventors = Inventor.objects.filter(preferred_name__icontains=name_query)
+        inventors = Inventor.objects.filter(preferred_name__icontains=name_query).order_by('id')
         paginator = Paginator()
         results = paginator.paginate_queryset(inventors, request)
         if not results:
