@@ -28,8 +28,10 @@ from .utils import (
     get_tokens_for_user,
     store_token_in_cookies,
 )
-from .models import User
-from .serializers import UserSerializer
+from .models import User, ActivityLog, Notification
+from .serializers import ActivityLogSerializer, NotificationSerializer, UserSerializer
+from inventors.serializers import InventorSerializer
+from config.pagination import Paginator
 
 class UserMeView(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
@@ -46,13 +48,13 @@ class UserMeView(viewsets.ViewSet):
 
     @swagger_auto_schema(
         operation_description="Update current user's details",
-        request_body=UserSerializer,
-        responses={200: openapi.Response(description="User updated", schema=UserSerializer())},
+        request_body=InventorSerializer,
+        responses={200: openapi.Response(description="User updated", schema=InventorSerializer())},
         tags=['User'],
         operation_summary="Update current user",
     )
     def update(self, request):
-        serializer = UserSerializer(request.user, data=request.data, partial=False)
+        serializer = InventorSerializer(request.user.inventor, data=request.data, partial=False)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -258,7 +260,7 @@ class ResetPasswordView(viewsets.ViewSet):
             return Response({'error': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
         token = PasswordResetTokenGenerator().make_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.id))
-        reset_link = f"http://localhost:8000/accounts/reset-password-confirm/{uid}/{token}/"
+        reset_link = f"{request.META.get('HTTP_ORIGIN', 'localhost:5137')}/reset-password/{uid}/{token}/"
         send_mail(
             'Password Reset Request',
             f'Click the link to reset your password: {reset_link}',
@@ -301,3 +303,133 @@ class ResetPasswordConfirmView(viewsets.ViewSet):
         user.password = make_password(new_password)
         user.save()
         return Response({'message': 'Password has been reset successfully.'}, status=status.HTTP_200_OK)
+      
+      
+# Notification endpoints
+
+class NotificationsList(viewsets.ViewSet):
+		permission_classes = [IsAuthenticated]
+
+		@swagger_auto_schema(
+				operation_description="Get notifications for the authenticated user",
+				manual_parameters=Paginator.PARAMETERS_DOCS,
+				responses={
+						200: openapi.Response(
+								description="List of notifications",
+								schema=NotificationSerializer(many=True)
+						)
+				},
+				tags=['Notifications'],
+				operation_summary="Get notifications",
+		)
+		def list(self, request):
+				notifications = request.user.notifications.all()
+				paginator = Paginator()
+				results = paginator.paginate_queryset(notifications, request)
+				serializer = NotificationSerializer(results, many=True)
+				return paginator.get_paginated_response(serializer.data)
+
+class NotificationDetails(viewsets.ViewSet):
+		permission_classes = [IsAuthenticated]
+
+		@swagger_auto_schema(
+				operation_description="Get a specific notification by ID",
+				responses={
+						200: openapi.Response(
+								description="Notification details",
+								schema=NotificationSerializer()
+						),
+						404: "Notification not found"
+				},
+				tags=['Notifications'],
+				operation_summary="Get notification by ID",
+		)
+		def retrieve(self, request, id=None):
+			try:
+				notification = request.user.notifications.get(pk=id)
+				serializer = NotificationSerializer(notification)
+				return Response(serializer.data, status=status.HTTP_200_OK)
+			except Notification.DoesNotExist:
+				return Response({"error": "Notification not found"}, status=status.HTTP_404_NOT_FOUND)
+		@swagger_auto_schema(
+				operation_description="Mark a notification as read",
+				responses={
+						200: openapi.Response(description="Notification marked as read"),
+						404: "Notification not found"
+				},
+				tags=['Notifications'],
+				operation_summary="Mark notification as read",
+		)
+
+		def mark_as_read(self, request, id=None):
+			try:
+				notification = request.user.notifications.get(pk=id)
+				notification.is_read = True
+				notification.save()
+				return Response({"message": "Notification marked as read"}, status=status.HTTP_200_OK)
+			except Notification.DoesNotExist:
+				return Response({"error": "Notification not found"}, status=status.HTTP_404_NOT_FOUND)
+
+		@swagger_auto_schema(
+				operation_description="Delete a notification",
+				responses={
+						204: "Notification deleted",
+						404: "Notification not found"
+				},
+				tags=['Notifications'],
+				operation_summary="Delete notification",
+		)
+		def destroy(self, request, id=None):
+			try:
+				notification = request.user.notifications.get(pk=id)
+				notification.delete()
+				return Response(status=status.HTTP_204_NO_CONTENT)
+			except Notification.DoesNotExist:
+				return Response({"error": "Notification not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
+# activity logs endpoint
+class ActivityLogs(viewsets.ViewSet):
+		permission_classes = [IsAuthenticated]
+
+		@swagger_auto_schema(
+				operation_description="Get activity logs for the authenticated user",
+				manual_parameters=Paginator.PARAMETERS_DOCS,
+				responses={
+						200: openapi.Response(
+								description="List of activity logs",
+								schema=ActivityLogSerializer(many=True)
+						)
+				},
+				tags=['Activity Logs'],
+				operation_summary="Get activity logs",
+		)
+		def list(self, request):
+				activity_logs = request.user.activity_logs.all()
+				paginator = Paginator()
+				results = paginator.paginate_queryset(activity_logs, request)
+				serializer = ActivityLogSerializer(results, many=True)
+				return paginator.get_paginated_response(serializer.data)
+
+class ActivityLogDetails(viewsets.ViewSet):
+		permission_classes = [IsAuthenticated]
+
+		@swagger_auto_schema(
+				operation_description="Get a specific activity log by ID",
+				responses={
+						200: openapi.Response(
+								description="Activity log details",
+								schema=ActivityLogSerializer()
+						),
+						404: "Activity log not found"
+				},
+				tags=['Activity Logs'],
+				operation_summary="Get activity log by ID",
+		)
+		def retrieve(self, request, pk=None):
+			try:
+				activity_log = request.user.activity_logs.get(pk=pk)
+				serializer = ActivityLogSerializer(activity_log)
+				return Response(serializer.data, status=status.HTTP_200_OK)
+			except ActivityLog.DoesNotExist:
+				return Response({"error": "Activity log not found"}, status=status.HTTP_404_NOT_FOUND)

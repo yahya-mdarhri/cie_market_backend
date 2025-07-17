@@ -263,7 +263,7 @@ class GetCoInventorsView(viewsets.ViewSet):
       for patent in patents:
         co_inventors.update(patent.inventors.exclude(id=inventor.id))
       paginator = Paginator()
-      results = paginator.paginate_queryset(co_inventors, request)
+      results = paginator.paginate_queryset(list(co_inventors), request)
       serializer = InventorSerializer(results, many=True)
       return paginator.get_paginated_response(serializer.data)
     except Inventor.DoesNotExist:
@@ -292,7 +292,7 @@ class GetInventorCoInventorsView(viewsets.ViewSet):
       for patent in patents:
         co_inventors.update(patent.inventors.exclude(id=id))
       paginator = Paginator()
-      results = paginator.paginate_queryset(co_inventors, request)
+      results = paginator.paginate_queryset(list(co_inventors), request)
       serializer = InventorSerializer(results, many=True)
       return paginator.get_paginated_response(serializer.data)
     except Inventor.DoesNotExist:
@@ -414,7 +414,7 @@ class GetTicketView(viewsets.ViewSet):
               return Response({"error": "You dont have access to this ticket"},status=status.HTTP_403_FORBIDDEN)
             serializer = TicketSerializer(ticket)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        except Inventor.DoesNotExist:
+        except Ticket.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
           
           

@@ -1,8 +1,7 @@
-from .models import User
+from .models import Notification, User
 from inventors.serializers import InventorSerializer
 from rest_framework import serializers
-
-from inventors.models import Inventor, Affiliation
+from .models import ActivityLog
 
 class UserSerializer(serializers.ModelSerializer):
 	inventor = InventorSerializer(required=False)
@@ -11,6 +10,11 @@ class UserSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = User
 		fields = ['email', 'inventor', 'id', 'password']
+		extra_kwargs = {
+			'id': {'read_only': True},
+			'password': {'write_only': True},
+			'inventor': {'required': False}
+		}
 
 	def validate_email(self, value):
 		if User.objects.filter(email=value).exists():
@@ -33,3 +37,16 @@ class UserSerializer(serializers.ModelSerializer):
 			inventor=inventor,
 		)
 		return user
+
+class ActivityLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ActivityLog
+        fields = ['id', 'action', 'activity_type', 'created_at']
+        read_only_fields = ['id', 'created_at']
+        
+
+class NotificationSerializer(serializers.ModelSerializer):
+		class Meta:
+				model = Notification
+				fields = ['id', 'message', 'created_at', 'is_read']
+				read_only_fields = ['id', 'created_at']
