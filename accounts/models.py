@@ -55,3 +55,35 @@ class User(PermissionsMixin, AbstractBaseUser):
 
   class Meta:
     db_table = 'users'
+    
+class Notification(models.Model):
+		user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+		message = models.TextField()
+		created_at = models.DateTimeField(auto_now_add=True)
+		is_read = models.BooleanField(default=False)
+
+		def __str__(self):
+				return f"Notification for {self.user.email} at {self.created_at}"
+		
+		class Meta:
+				db_table = 'notifications'
+				ordering = ['-created_at']
+
+class ActivityLog(models.Model):
+    ACTIVITY_TYPES = [
+        ('create', 'Created'),
+        ('update', 'Updated'),
+        ('add', 'Added'),
+        ('approve', 'Approved'),
+    ]
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='activity_logs')
+    action = models.CharField(max_length=255)
+    activity_type = models.CharField(max_length=20, choices=ACTIVITY_TYPES)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.email} - {self.action} at {self.created_at}"
+
+    class Meta:
+        db_table = 'activity_logs'
+        ordering = ['-created_at']

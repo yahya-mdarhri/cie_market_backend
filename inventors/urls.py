@@ -17,12 +17,16 @@ urlpatterns = [
     path ('patents/<str:inv_a>/<str:inv_b>', GetSharedPatentsView.as_view({'get': 'list'}), name='shared-patents'),
     
     path('tickets/', ListTicketsView.as_view({'get': 'list'}), name='my-tickets'),
-    path('ticket/<int:id>/', GetTicketView.as_view({'get': 'retrieve'}), name='ticket-detail'),
+    path('tickets/drafts/', ListDraftTicketsView.as_view({'get': 'list'}), name='my-draft-tickets'),
+    path('ticket/<int:id>/', GetTicketView.as_view({'get': 'retrieve', 'put' : 'update', 'delete': 'destroy'}), name='ticket-detail'),
+		path('ticket/create/', CreateTicketView.as_view({'post': 'create'}), name='ticket-create'),
     
+    path('inventors/search/', SearchInventorByNameView.as_view(), name='search-inventor-by-name'),
     path('inventor/co-inventors', GetCoInventorsView.as_view({'get': 'list'}), name='my-coInventors'),
     path('inventor/<str:id>/', GetInventorView.as_view({'get': 'retrieve'}), name='inventor-detail'),
     path('inventor/<str:id>/patents', GetInventorPatentsView.as_view({'get': 'list'}), name='inventor-patents'),
     path('inventor/<str:id>/co-inventors', GetInventorCoInventorsView.as_view({'get': 'list'}), name='inventor-co_inventors'),
+
 
     path('affiliation/<str:id>/', GetAffiliationView.as_view({'get': 'retrieve'}), name='affiliation-detail'),
     path('affiliation/<str:id>/patents', GetAffiliationPatentsView.as_view({'get': 'list'}), name='affiliation-detail'),

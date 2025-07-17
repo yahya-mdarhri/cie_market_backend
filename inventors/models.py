@@ -52,9 +52,10 @@ class Ticket(models.Model):
     blank=True,
     default=list,
   )
-  status = models.CharField(max_length=255, null=False)
+  status = models.CharField(max_length=7, null=False, default='pending')
   meeting_date = models.DateTimeField(null=True, blank=True)
   created_at = models.DateTimeField(auto_now_add=True)
+  is_draft = models.BooleanField(default=True)
 
   class Meta:
     db_table = 'tickets'
