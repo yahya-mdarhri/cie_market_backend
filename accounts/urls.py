@@ -19,6 +19,8 @@ urlpatterns = [
     path('register/', RegisterView.as_view({'post':'create'}), name='register'),
     path('logout/', LogoutView.as_view({'get':'retrieve'}), name='logout'),
 
+    path('create-account/', ManagerCreateInventorAccount.as_view({'post': 'create'}), name='create-account'),
+
     path('change-password/', ChangePasswordView.as_view({'post': 'create'}), name='change-password'),
     path('reset-password/', ResetPasswordView.as_view({'post': 'create'}), name='reset-password'),  # <-- added
     path('reset-password-confirm/<uidb64>/<token>/', ResetPasswordConfirmView.as_view({'post': 'create'}), name='reset-password-confirm'),

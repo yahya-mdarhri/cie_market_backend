@@ -12,7 +12,7 @@ class InventorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Inventor
         fields = '__all__'
-        read_only_fields = ['id']
+        # read_only_fields = ['id']
 
 
 class TicketSerializer(serializers.ModelSerializer):

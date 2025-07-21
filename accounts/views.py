@@ -33,6 +33,8 @@ from .serializers import ActivityLogSerializer, NotificationSerializer, UserSeri
 from inventors.serializers import InventorSerializer
 from config.pagination import Paginator
 
+import string, secrets
+
 class UserMeView(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
@@ -433,3 +435,39 @@ class ActivityLogDetails(viewsets.ViewSet):
 				return Response(serializer.data, status=status.HTTP_200_OK)
 			except ActivityLog.DoesNotExist:
 				return Response({"error": "Activity log not found"}, status=status.HTTP_404_NOT_FOUND)
+
+class ManagerCreateInventorAccount(viewsets.ViewSet):
+		permission_classes = [AllowAny]
+
+		def generate_password(self, length=12):
+				chars = string.ascii_letters + string.digits + string.punctuation
+				return ''.join(secrets.choice(chars) for _ in range(length))
+
+		def create(self, request):
+				SHARED_MANAGER_PASSWORD = 'default_1qaz2wsx3edc4rfv'
+				data = request.data
+				shared_password = data.get('shared_password')
+				inventor_data = data.get('inventor')
+				if not shared_password or not inventor_data:
+						return Response({"error": "Shared password and inventor data are required."}, status=status.HTTP_400_BAD_REQUEST)
+				if shared_password != SHARED_MANAGER_PASSWORD:
+						return Response({"error": "Invalid shared password."}, status=status.HTTP_403_FORBIDDEN)
+				inventor_serializer = InventorSerializer(data=inventor_data)
+				if not inventor_serializer.is_valid():
+						return Response(inventor_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+				inventor = inventor_serializer.save()
+				generated_password = self.generate_password()
+				user = User.objects.create(
+						email=inventor_data.get('email'),
+						inventor=inventor,
+						password=make_password(generated_password)
+				)
+				send_mail(
+						'Your Inventor Account Credentials',
+						f'Email: {user.email}\nPassword: {generated_password}',
+						settings.DEFAULT_FROM_EMAIL,
+						[user.email],
+						fail_silently=False,
+				)
+				return Response({"message": "Inventor account created and credentials sent via email.", "credentials": {"email": user.email, "password": generated_password}}, status=status.HTTP_201_CREATED)
+        

@@ -24,7 +24,7 @@ from drf_yasg import openapi
 # MEADIA_TYPE = ['application/x-www-form-urlencoded', 'application/json']
 
 class ListAffiliationsView(viewsets.ViewSet):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     @swagger_auto_schema(
         operation_description="Retrieve a list of all affiliations",

@@ -42,7 +42,6 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 # Application definition
-
 AUTH_COOKIE = 'access_token'
 AUTH_USER_MODEL = 'accounts.User'
 
