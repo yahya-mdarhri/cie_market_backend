@@ -43,6 +43,7 @@ urlpatterns = [
     # path('', HomeView.as_view({'get': 'retrieve'}), name='home'),
     path('api/accounts/', include('accounts.urls')),
     path('api/inventors/', include('inventors.urls')),
+    path('api/public/', include('public.urls')),
 
 
     # API docs URLs

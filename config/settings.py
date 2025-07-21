@@ -81,6 +81,7 @@ REST_FRAMEWORK = {
 INSTALLED_APPS = [
     'accounts',
     'inventors',
+    'public',
 
     'drf_yasg',
     'corsheaders',

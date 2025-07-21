@@ -88,16 +88,3 @@ class ActivityLog(models.Model):
     class Meta:
         db_table = 'activity_logs'
         ordering = ['-created_at']
-
-class InnovationDiagnosisSubmission(models.Model):
-    name = models.CharField(max_length=100)
-    email = models.EmailField()
-    organisation = models.CharField(max_length=100)
-    position = models.CharField(max_length=100)
-    phone = models.CharField(max_length=20)
-    responses = JSONField()
-    submitted_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        db_table = 'innovation_diagnosis_submissions'
-        ordering = ['-submitted_at']
