@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
@@ -13,7 +14,7 @@ class Affiliation(models.Model):
     db_table = 'affiliations'
 
 class Inventor(models.Model):
-  id = models.CharField(primary_key=True, max_length=20)
+  id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
   preferred_name = models.CharField(max_length=150, null=False)
   name_variants = ArrayField(
     models.CharField(max_length=30),
@@ -29,7 +30,7 @@ class Inventor(models.Model):
     related_name='inventors'
   )
   email = models.EmailField(default=None,null=True, blank=True)
-  image = models.ImageField(upload_to='inventors/images/', default=None, blank=True, null=True)
+  image = models.ImageField(upload_to='avatars/', default=None, blank=True, null=True)
   orcid = models.CharField(max_length=19, default=None, blank=True, null=True)
   phone_number = models.CharField(max_length=11, blank=True, null=True, default=None)
 
@@ -40,6 +41,7 @@ class Inventor(models.Model):
     db_table = 'inventors'
 
 class Ticket(models.Model):
+  id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
   title = models.CharField(max_length=255, null=False)
   summary = models.CharField(max_length=255, null=False)
   context = models.TextField(null=False)
@@ -97,7 +99,7 @@ class Patent(models.Model):
     ("K", "Manufacturing & Industrial Equipment"),
     ("L", "Telecommunications"),
   )
-
+  id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
   title = models.CharField(max_length=255, null=False, blank=False)
   deposit_number = models.BigIntegerField(null=False, unique=True)
   deposit_document = models.CharField(max_length=255, null=False, blank=False) # maybe a file field

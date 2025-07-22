@@ -9,10 +9,12 @@ class AffiliationSerializer(serializers.ModelSerializer):
 
 
 class InventorSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(required=False, allow_null=True)
+
     class Meta:
         model = Inventor
         fields = '__all__'
-        read_only_fields = ['id']
+        # read_only_fields = ['id']
 
 
 class TicketSerializer(serializers.ModelSerializer):

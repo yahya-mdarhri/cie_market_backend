@@ -12,6 +12,7 @@ from rest_framework import (
 )
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.parsers import MultiPartParser, FormParser
 
 from .models import *
 from .serializers import *
@@ -24,7 +25,7 @@ from drf_yasg import openapi
 # MEADIA_TYPE = ['application/x-www-form-urlencoded', 'application/json']
 
 class ListAffiliationsView(viewsets.ViewSet):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     @swagger_auto_schema(
         operation_description="Retrieve a list of all affiliations",
@@ -101,6 +102,7 @@ class ListInventorsView(viewsets.ViewSet):
 
 class GetInventorView(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
 
     @swagger_auto_schema(
         operation_description="Retrieve a specific inventor by ID",

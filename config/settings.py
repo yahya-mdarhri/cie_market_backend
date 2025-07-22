@@ -17,10 +17,15 @@ import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+MEDIA_URL = '/uploads/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads')
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+
 env_path = BASE_DIR / '.env'
 config = Config(RepositoryEnv(str(env_path)))
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-config = Config(RepositoryEnv(str(env_path)))
+
 
 
 # Quick-start development settings - unsuitable for production
@@ -39,10 +44,11 @@ APPEND_SLASH = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "https://localhost:5173",
+
 ]
 
 # Application definition
-
 AUTH_COOKIE = 'access_token'
 AUTH_USER_MODEL = 'accounts.User'
 
@@ -82,6 +88,7 @@ REST_FRAMEWORK = {
 INSTALLED_APPS = [
     'accounts',
     'inventors',
+    'public',
 
     'drf_yasg',
     'corsheaders',
