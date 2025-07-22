@@ -45,7 +45,7 @@ class UserMeView(viewsets.ViewSet):
         operation_summary="Get current user",
     )
     def retrieve(self, request):
-        serializer = UserSerializer(request.user)
+        serializer = UserSerializer(request.user, context={'request': request})
         return Response(serializer.data)
 
     @swagger_auto_schema(
