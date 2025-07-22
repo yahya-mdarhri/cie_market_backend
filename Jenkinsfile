@@ -4,6 +4,7 @@ pipeline {
     environment {
         IMAGE_NAME = 'hossine/cie-market-backend'
         TAG = 'latest'
+        HEROKU_APP = 'backendciemarket'
     }
 
     stages {
@@ -12,6 +13,7 @@ pipeline {
                 checkout scm
             }
         }
+
         stage('Check Docker') {
             steps {
                 script {
@@ -27,6 +29,7 @@ pipeline {
                 }
             }
         }
+
         stage('Build Docker Image') {
             steps {
                 script {
@@ -34,31 +37,64 @@ pipeline {
                 }
             }
         }
+
         stage('Run Tests') {
             steps {
-                script {
-                    sh 'echo "Running tests inside the Docker container..."'
+                echo "✅ Tests would run here inside Docker container."
+                // You can add real tests if you have them
+            }
+        }
+
+        stage('Login to Heroku') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'heroku-api-key', variable: 'HEROKU_API_KEY')
+                ]) {
+                    sh 'echo $HEROKU_API_KEY | docker login --username=_ --password-stdin registry.heroku.com'
                 }
             }
         }
 
         stage('Login to Docker Hub') {
-                steps {
-                    withCredentials([
-                        usernamePassword(
-                            credentialsId: 'docker-hub-credentials',
-                            usernameVariable: 'USERNAME',
-                            passwordVariable: 'PASSWORD'
-                        )
-                    ]) {
-                        sh 'docker login -u $USERNAME -p $PASSWORD'
-                    }
+            steps {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'docker-hub-credentials',
+                        usernameVariable: 'USERNAME',
+                        passwordVariable: 'PASSWORD'
+                    )
+                ]) {
+                    sh 'docker login -u $USERNAME -p $PASSWORD'
                 }
             }
+        }
 
         stage('Push Image to Docker Hub') {
             steps {
                 sh 'docker push $IMAGE_NAME:$TAG'
+            }
+        }
+
+        stage('Tag and Push to Heroku') {
+            steps {
+                script {
+                    def herokuImage = "registry.heroku.com/${HEROKU_APP}/web"
+                    sh """
+                        docker build --platform=linux/amd64 -t registry.heroku.com/backendciemarket/web . --provenance=false
+                        docker push registry.heroku.com/backendciemarket/web
+                        heroku container:release web --app backendciemarket
+                    """
+                }
+            }
+        }
+
+        stage('Release Heroku App') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'heroku-api-key', variable: 'HEROKU_API_KEY')
+                ]) {
+                    sh "heroku container:release web --app backendciemarket"
+                }
             }
         }
     }
