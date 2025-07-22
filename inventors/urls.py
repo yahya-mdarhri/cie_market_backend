@@ -13,19 +13,19 @@ router.register(r'affiliations', ListAffiliationsView, basename='affiliations')
 urlpatterns = [
     path('', include(router.urls)),
     path('patents/', ListPatentsView.as_view({'get': 'list'}), name='pmy-patents'),
-    path('patent/<int:id>/', GetPatentView.as_view({'get': 'retrieve'}), name='patent-detail'),
-    path ('patents/<str:inv_a>/<str:inv_b>', GetSharedPatentsView.as_view({'get': 'list'}), name='shared-patents'),
+    path('patent/<uuid:id>/', GetPatentView.as_view({'get': 'retrieve'}), name='patent-detail'),
+    path ('patents/<uuid:inv_a>/<uuid:inv_b>', GetSharedPatentsView.as_view({'get': 'list'}), name='shared-patents'),
     
     path('tickets/', ListTicketsView.as_view({'get': 'list'}), name='my-tickets'),
     path('tickets/drafts/', ListDraftTicketsView.as_view({'get': 'list'}), name='my-draft-tickets'),
-    path('ticket/<int:id>/', GetTicketView.as_view({'get': 'retrieve', 'put' : 'update', 'delete': 'destroy'}), name='ticket-detail'),
+    path('ticket/<uuid:id>/', GetTicketView.as_view({'get': 'retrieve', 'put' : 'update', 'delete': 'destroy'}), name='ticket-detail'),
 		path('ticket/create/', CreateTicketView.as_view({'post': 'create'}), name='ticket-create'),
     
     path('inventors/search/', SearchInventorByNameView.as_view(), name='search-inventor-by-name'),
     path('inventor/co-inventors', GetCoInventorsView.as_view({'get': 'list'}), name='my-coInventors'),
-    path('inventor/<str:id>/', GetInventorView.as_view({'get': 'retrieve'}), name='inventor-detail'),
-    path('inventor/<str:id>/patents', GetInventorPatentsView.as_view({'get': 'list'}), name='inventor-patents'),
-    path('inventor/<str:id>/co-inventors', GetInventorCoInventorsView.as_view({'get': 'list'}), name='inventor-co_inventors'),
+    path('inventor/<uuid:id>/', GetInventorView.as_view({'get': 'retrieve'}), name='inventor-detail'),
+    path('inventor/<uuid:id>/patents', GetInventorPatentsView.as_view({'get': 'list'}), name='inventor-patents'),
+    path('inventor/<uuid:id>/co-inventors', GetInventorCoInventorsView.as_view({'get': 'list'}), name='inventor-co_inventors'),
 
 
     path('affiliation/<str:id>/', GetAffiliationView.as_view({'get': 'retrieve'}), name='affiliation-detail'),

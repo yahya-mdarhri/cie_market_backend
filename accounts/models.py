@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.base_user import AbstractBaseUser,BaseUserManager
@@ -36,6 +37,7 @@ class User(PermissionsMixin, AbstractBaseUser):
   USERNAME_FIELD = 'email'
 
   objects = UserManager()
+  id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
   email = models.EmailField(unique=True)
   inventor = models.OneToOneField(
