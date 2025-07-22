@@ -9,6 +9,8 @@ class AffiliationSerializer(serializers.ModelSerializer):
 
 
 class InventorSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(required=False, allow_null=True)
+
     class Meta:
         model = Inventor
         fields = '__all__'

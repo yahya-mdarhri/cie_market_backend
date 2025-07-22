@@ -30,7 +30,7 @@ class Inventor(models.Model):
     related_name='inventors'
   )
   email = models.EmailField(default=None,null=True, blank=True)
-  image = models.ImageField(upload_to='inventors/images/', default=None, blank=True, null=True)
+  image = models.ImageField(upload_to='avatars/', default=None, blank=True, null=True)
   orcid = models.CharField(max_length=19, default=None, blank=True, null=True)
   phone_number = models.CharField(max_length=11, blank=True, null=True, default=None)
 
