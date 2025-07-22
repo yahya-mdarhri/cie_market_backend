@@ -97,7 +97,7 @@ class ListInventorsView(viewsets.ViewSet):
         inventors = Inventor.objects.all().order_by('id')
         paginator = Paginator()
         results = paginator.paginate_queryset(inventors, request)
-        serializer = InventorSerializer(results, many=True)
+        serializer = InventorSerializer(results, many=True, context={'request': request})
         return paginator.get_paginated_response(serializer.data)
 
 class GetInventorView(viewsets.ViewSet):
@@ -128,7 +128,7 @@ class GetInventorView(viewsets.ViewSet):
     def retrieve(self, request, id=None):
         try: 
             inventor = Inventor.objects.get(id=id)
-            serializer = InventorSerializer(inventor)
+            serializer = InventorSerializer(inventor, context={'request': request})
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Inventor.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -266,7 +266,7 @@ class GetCoInventorsView(viewsets.ViewSet):
         co_inventors.update(patent.inventors.exclude(id=inventor.id))
       paginator = Paginator()
       results = paginator.paginate_queryset(list(co_inventors), request)
-      serializer = InventorSerializer(results, many=True)
+      serializer = InventorSerializer(results, many=True, context={'request': request})
       return paginator.get_paginated_response(serializer.data)
     except Inventor.DoesNotExist:
       return Response(status=status.HTTP_404_NOT_FOUND)
@@ -295,7 +295,7 @@ class GetInventorCoInventorsView(viewsets.ViewSet):
         co_inventors.update(patent.inventors.exclude(id=id))
       paginator = Paginator()
       results = paginator.paginate_queryset(list(co_inventors), request)
-      serializer = InventorSerializer(results, many=True)
+      serializer = InventorSerializer(results, many=True, context={'request': request})
       return paginator.get_paginated_response(serializer.data)
     except Inventor.DoesNotExist:
       return Response(status=status.HTTP_404_NOT_FOUND)
@@ -543,5 +543,5 @@ class SearchInventorByNameView(APIView):
         results = paginator.paginate_queryset(inventors, request)
         if not results:
             return Response({"message": "No inventors found matching the query"}, status=status.HTTP_404_NOT_FOUND)
-        serializer = InventorSerializer(results, many=True)
+        serializer = InventorSerializer(results, many=True, context={'request': request})
         return paginator.get_paginated_response(serializer.data)
