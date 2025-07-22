@@ -128,7 +128,16 @@ class RegisterView(viewsets.ViewSet):
     def create(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            user = serializer.save()
+            ActivityLog.objects.create(
+                user=user,
+                action=f"Joined the platform",
+                activity_type='create'
+            )
+            Notification.objects.create(
+                user=user,
+                message="Welcome! Your account has been successfully created."
+            )
             return Response({'message': 'User registered successfully'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -230,6 +239,15 @@ class ChangePasswordView(viewsets.ViewSet):
             return Response({'detail': 'Old password is incorrect.'}, status=status.HTTP_400_BAD_REQUEST)
         user.password = (make_password(new_password))
         user.save()
+        ActivityLog.objects.create(
+            user=user,
+            action="Changed password",
+            activity_type='update'
+        )
+        Notification.objects.create(
+            user=user,
+            message="Your password has been changed successfully."
+        )
         return Response({'detail': 'Password changed successfully.'})
 
 class ResetPasswordView(viewsets.ViewSet):
@@ -440,7 +458,7 @@ class ManagerCreateInventorAccount(viewsets.ViewSet):
 		permission_classes = [AllowAny]
 
 		def generate_password(self, length=12):
-				chars = string.ascii_letters + string.digits + string.punctuation
+				chars = string.ascii_letters + string.digits + '_-'
 				return ''.join(secrets.choice(chars) for _ in range(length))
 
 		def create(self, request):
@@ -461,6 +479,10 @@ class ManagerCreateInventorAccount(viewsets.ViewSet):
 						email=inventor_data.get('email'),
 						inventor=inventor,
 						password=make_password(generated_password)
+				)
+				Notification.objects.create(
+						user=user,
+						message="A manager has created an account for you. Welcome to the platform!"
 				)
 				send_mail(
 						'Your Inventor Account Credentials',
