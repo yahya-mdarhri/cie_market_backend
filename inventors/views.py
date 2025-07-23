@@ -14,6 +14,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser
 
+from accounts.models import *
 from .models import *
 from .serializers import *
 
@@ -43,7 +44,7 @@ class ListAffiliationsView(viewsets.ViewSet):
         affiliations = Affiliation.objects.all().order_by('id')
         paginator = Paginator()
         results = paginator.paginate_queryset(affiliations, request)
-        serializer = AffiliationSerializer(results, many=True)
+        serializer = AffiliationSerializer(results, many=True, context={'request': request})
         return paginator.get_paginated_response(serializer.data)
 
 class GetAffiliationView(viewsets.ViewSet):
@@ -73,7 +74,7 @@ class GetAffiliationView(viewsets.ViewSet):
     def retrieve(self, request, id=None):
         try:
             affiliation = Affiliation.objects.get(id=id)
-            serializer = AffiliationSerializer(affiliation)
+            serializer = AffiliationSerializer(affiliation, context={'request': request})
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Affiliation.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -97,7 +98,7 @@ class ListInventorsView(viewsets.ViewSet):
         inventors = Inventor.objects.all().order_by('id')
         paginator = Paginator()
         results = paginator.paginate_queryset(inventors, request)
-        serializer = InventorSerializer(results, many=True)
+        serializer = InventorSerializer(results, many=True, context={'request': request})
         return paginator.get_paginated_response(serializer.data)
 
 class GetInventorView(viewsets.ViewSet):
@@ -128,7 +129,7 @@ class GetInventorView(viewsets.ViewSet):
     def retrieve(self, request, id=None):
         try: 
             inventor = Inventor.objects.get(id=id)
-            serializer = InventorSerializer(inventor)
+            serializer = InventorSerializer(inventor, context={'request': request})
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Inventor.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -156,7 +157,7 @@ class ListPatentsView(viewsets.ViewSet):
       patents = Patent.objects.filter(inventors=inventor).order_by('id')
       paginator = Paginator()
       results = paginator.paginate_queryset(patents, request)
-      serializer = PatentSerializer(results, many=True)
+      serializer = PatentSerializer(results, many=True, context={'request': request})
       return paginator.get_paginated_response(serializer.data)
 
 class GetPatentView(viewsets.ViewSet):
@@ -186,7 +187,7 @@ class GetPatentView(viewsets.ViewSet):
     def retrieve(self, request, id=None):
         try:
             patent = Patent.objects.get(id=id)
-            serializer = PatentSerializer(patent)
+            serializer = PatentSerializer(patent, context={'request': request})
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Inventor.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -212,7 +213,7 @@ class GetInventorPatentsView(viewsets.ViewSet):
             patents = Patent.objects.filter(inventors=inventor).order_by('id')
             paginator = Paginator()
             results = paginator.paginate_queryset(patents, request)
-            serializer = PatentSerializer(results, many=True)
+            serializer = PatentSerializer(results, many=True, context={'request': request})
             return paginator.get_paginated_response(serializer.data)
         except Inventor.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -238,7 +239,7 @@ class GetAffiliationPatentsView(viewsets.ViewSet):
       patents = Patent.objects.filter(affiliation=affiliation).order_by('id')
       paginator = Paginator()
       results = paginator.paginate_queryset(patents, request)
-      serializer = PatentSerializer(results, many=True)
+      serializer = PatentSerializer(results, many=True, context={'request': request})
       return paginator.get_paginated_response(serializer.data)
     except Affiliation.DoesNotExist:
       return Response(status=status.HTTP_404_NOT_FOUND)
@@ -266,7 +267,7 @@ class GetCoInventorsView(viewsets.ViewSet):
         co_inventors.update(patent.inventors.exclude(id=inventor.id))
       paginator = Paginator()
       results = paginator.paginate_queryset(list(co_inventors), request)
-      serializer = InventorSerializer(results, many=True)
+      serializer = InventorSerializer(results, many=True, context={'request': request})
       return paginator.get_paginated_response(serializer.data)
     except Inventor.DoesNotExist:
       return Response(status=status.HTTP_404_NOT_FOUND)
@@ -295,7 +296,7 @@ class GetInventorCoInventorsView(viewsets.ViewSet):
         co_inventors.update(patent.inventors.exclude(id=id))
       paginator = Paginator()
       results = paginator.paginate_queryset(list(co_inventors), request)
-      serializer = InventorSerializer(results, many=True)
+      serializer = InventorSerializer(results, many=True, context={'request': request})
       return paginator.get_paginated_response(serializer.data)
     except Inventor.DoesNotExist:
       return Response(status=status.HTTP_404_NOT_FOUND)
@@ -325,7 +326,7 @@ class GetSharedPatentsView(viewsets.ViewSet):
       patents = Patent.objects.filter(inventors=inventor_a).filter(inventors=inventor_b).order_by('id')
       paginator = Paginator()
       results = paginator.paginate_queryset(patents, request)
-      serializer = PatentSerializer(results, many=True)
+      serializer = PatentSerializer(results, many=True, context={'request': request})
       return paginator.get_paginated_response(serializer.data)
     except Inventor.DoesNotExist:
       return Response(status=status.HTTP_404_NOT_FOUND)
@@ -352,7 +353,7 @@ class ListTicketsView(viewsets.ViewSet):
       tickets = Ticket.objects.filter(inventors=inventor, is_draft=False).order_by('id')
       paginator = Paginator()
       results = paginator.paginate_queryset(tickets, request)
-      serializer = TicketSerializer(results, many=True)
+      serializer = TicketSerializer(results, many=True, context={'request': request})
       return paginator.get_paginated_response(serializer.data)
 
 class ListDraftTicketsView(viewsets.ViewSet):
@@ -376,7 +377,7 @@ class ListDraftTicketsView(viewsets.ViewSet):
 			paginator = Paginator()
 			tickets = Ticket.objects.filter(inventors=inventor, is_draft=True).order_by('id')
 			results = paginator.paginate_queryset(tickets, request)
-			serializer = TicketSerializer(results, many=True)
+			serializer = TicketSerializer(results, many=True, context={'request': request})
 			return paginator.get_paginated_response(serializer.data)
 
 class GetTicketView(viewsets.ViewSet):
@@ -414,7 +415,7 @@ class GetTicketView(viewsets.ViewSet):
             ticket = Ticket.objects.get(id=id)
             if not ticket.inventors.filter(id=request.user.inventor.id).exists():
               return Response({"error": "You dont have access to this ticket"},status=status.HTTP_403_FORBIDDEN)
-            serializer = TicketSerializer(ticket)
+            serializer = TicketSerializer(ticket, context={'request': request})
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Ticket.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -447,7 +448,7 @@ class GetTicketView(viewsets.ViewSet):
             ticket = Ticket.objects.get(id=id)
             if not ticket.inventors.filter(id=request.user.inventor.id).exists():
                 return Response({"error": "You dont have access to this ticket"}, status=status.HTTP_403_FORBIDDEN)
-            serializer = TicketSerializer(ticket, data=request.data, partial=True)
+            serializer = TicketSerializer(ticket, data=request.data, partial=True, context={'request': request})
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
@@ -499,14 +500,29 @@ class CreateTicketView(viewsets.ViewSet):
 				tags=['Tickets'],
 		)
 		def create(self, request):
-				serializer = TicketSerializer(data=request.data)
-				# Ensure the authenticated user is added as an inventor to the ticket
-				if not 'inventors' in request.data:
-					request.data['inventors'] = [request.user.inventor.id]
-				else:
-					request.data['inventors'].append(request.user.inventor.id)
+				data = request.data.copy() 
+				inventors = data.getlist('inventors') if hasattr(data, 'getlist') else data.get('inventors', [])
+				if not inventors:
+					inventors = [str(request.user.inventor.id)]
+				elif str(request.user.inventor.id) not in inventors:
+						inventors = list(set([str(i) for i in inventors] + [str(request.user.inventor.id)]))
+				data.setlist('inventors', inventors) if hasattr(data, 'setlist') else data.update({'inventors': inventors})
+
+				serializer = TicketSerializer(data=data, context={'request': request})
 				if serializer.is_valid():
-						serializer.save()
+						ticket = serializer.save()
+						ActivityLog.objects.create(
+								user=request.user,
+								action=f"Created ticket with ID {ticket.id}",
+								activity_type='create'
+						)
+						# Notify co-inventors that they have been added to the ticket, but not the creator
+						for inventor in ticket.inventors.all():
+								if hasattr(inventor, 'user') and inventor.user != request.user:
+										Notification.objects.create(
+												user=inventor.user,
+												message=f"You have been added to ticket #{ticket.id} by {request.user.inventor.preferred_name}."
+										)
 						return Response(serializer.data, status=status.HTTP_201_CREATED)
 				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -538,10 +554,10 @@ class SearchInventorByNameView(APIView):
         name_query = request.data.get('name', None)
         if not name_query:
             return Response({"error": "Missing 'name' in request body"}, status=status.HTTP_400_BAD_REQUEST)
-        inventors = Inventor.objects.filter(preferred_name__icontains=name_query).order_by('id')
+        inventors = Inventor.objects.filter(preferred_name__icontains=name_query).order_by('id').exclude(id=request.user.inventor.id)
         paginator = Paginator()
         results = paginator.paginate_queryset(inventors, request)
         if not results:
             return Response({"message": "No inventors found matching the query"}, status=status.HTTP_404_NOT_FOUND)
-        serializer = InventorSerializer(results, many=True)
+        serializer = InventorSerializer(results, many=True, context={'request': request})
         return paginator.get_paginated_response(serializer.data)

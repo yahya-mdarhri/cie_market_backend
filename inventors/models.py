@@ -46,7 +46,7 @@ class Ticket(models.Model):
   summary = models.CharField(max_length=255, null=False)
   context = models.TextField(null=False)
   problem_identification = models.TextField(null=False)
-  drawings = models.CharField(max_length=255, null=True, blank=True) # maybe a file field
+  drawings = models.FileField(upload_to='drawings/', null=True, blank=True)  # <-- single file field
   inventors = models.ManyToManyField(Inventor, related_name='+') # ticket -> inventors (1-way)
   co_applications = ArrayField(
     models.CharField(max_length=255),
