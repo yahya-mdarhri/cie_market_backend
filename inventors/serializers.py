@@ -18,7 +18,7 @@ class InventorSerializer(serializers.ModelSerializer):
 
 
 class TicketSerializer(serializers.ModelSerializer):
-
+    drawings = serializers.FileField(required=False, allow_null=True, use_url=True)
     class Meta:
         model = Ticket
         fields = '__all__'
