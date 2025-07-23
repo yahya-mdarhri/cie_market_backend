@@ -349,6 +349,18 @@ class NotificationsList(viewsets.ViewSet):
 				serializer = NotificationSerializer(results, many=True)
 				return paginator.get_paginated_response(serializer.data)
 
+		@swagger_auto_schema(
+				operation_description="Mark all notifications as read",
+				responses={
+						200: openapi.Response(description="All notifications marked as read")
+				},
+				tags=['Notifications'],
+				operation_summary="Mark all notifications as read",
+		)
+		def mark_all_read(self, request):
+				request.user.notifications.update(is_read=True)
+				return Response({"message": "All notifications marked as read"}, status=status.HTTP_200_OK)
+
 class NotificationDetails(viewsets.ViewSet):
 		permission_classes = [IsAuthenticated]
 
