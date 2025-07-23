@@ -30,9 +30,11 @@ def store_token_in_cookies(response, token) -> None:
     lifetime = settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME']
     expires_at = datetime.now(timezone.utc) + lifetime
     response.set_cookie(
-        settings.AUTH_COOKIE,
+        key=settings.AUTH_COOKIE,
         value=token,
         expires=expires_at,
-        httponly=settings.SESSION_COOKIE_HTTPONLY,
-        samesite=settings.SESSION_COOKIE_SAMESITE
+        httponly=True,
+        secure=True,
+        samesite='None',
+        path='/',
     )
