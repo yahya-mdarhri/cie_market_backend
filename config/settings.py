@@ -42,11 +42,7 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 APPEND_SLASH = True
 
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "https://localhost:5173",
-
-]
+CORS_ALLOW_ALL_ORIGINS = config('CORS_ALLOW_ALL_ORIGINS', default=True, cast=bool)
 
 # Application definition
 AUTH_COOKIE = 'access_token'
@@ -123,10 +119,14 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "django.middleware.security.SecurityMiddleware",
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 ROOT_URLCONF = 'config.urls'
 
@@ -203,3 +203,10 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# tell Django where to put `collectstatic`’s output
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# (optional) if you have other static dirs:
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
