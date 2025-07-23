@@ -42,7 +42,10 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 APPEND_SLASH = True
 
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_ALL_ORIGINS = config('CORS_ALLOW_ALL_ORIGINS', default=True, cast=bool)
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    "*",
+]
 
 # Application definition
 AUTH_COOKIE = 'access_token'

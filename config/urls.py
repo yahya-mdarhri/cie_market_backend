@@ -33,6 +33,7 @@ schema_view = get_schema_view(
         # contact=openapi.Contact(email="support@example.com"),
         # license=openapi.License(name="BSD License"),
     ),
+    url="https://backendciemarket-baa6b6e1090a.herokuapp.com",
     public=False,
     permission_classes=(permissions.AllowAny,),
     authentication_classes=(TokenAuthentication,),
