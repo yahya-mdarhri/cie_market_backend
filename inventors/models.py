@@ -47,7 +47,7 @@ class Ticket(models.Model):
   context = models.TextField(null=False)
   problem_identification = models.TextField(null=False)
   drawings = models.FileField(upload_to='drawings/', null=True, blank=True)  # <-- single file field
-  inventors = models.ManyToManyField(Inventor, related_name='+') # ticket -> inventors (1-way)
+  inventors = models.ManyToManyField(Inventor, related_name='tickets') # ticket -> inventors (1-way)
   co_applications = ArrayField(
     models.CharField(max_length=255),
     null=True,
@@ -110,7 +110,7 @@ class Patent(models.Model):
   delivery_document = models.CharField(max_length=255, null=False, blank=False) # maybe a file field
   delivery_date = models.DateField(null=True, blank=True)
   status = models.CharField(max_length=1, choices=PATENT_STATUS, null=False, default='A') # Note_1
-  inventors = models.ManyToManyField(Inventor, related_name='inventors') # no reverse relation
+  inventors = models.ManyToManyField(Inventor, related_name='patents') # no reverse relation
   TRL_level = models.BigIntegerField(null=True, blank=True)
   CRL_level = models.BigIntegerField(null=True, blank=True)
   affiliation = models.ForeignKey(
