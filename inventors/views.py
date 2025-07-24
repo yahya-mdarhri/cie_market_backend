@@ -513,7 +513,7 @@ class CreateTicketView(viewsets.ViewSet):
 						ticket = serializer.save()
 						ActivityLog.objects.create(
 								user=request.user,
-								action=f"Created ticket with ID {ticket.id}",
+								action=f"You created a ticket",
 								activity_type='create'
 						)
 						# Notify co-inventors that they have been added to the ticket, but not the creator
@@ -521,7 +521,7 @@ class CreateTicketView(viewsets.ViewSet):
 								if hasattr(inventor, 'user') and inventor.user != request.user:
 										Notification.objects.create(
 												user=inventor.user,
-												message=f"You have been added to ticket #{ticket.id} by {request.user.inventor.preferred_name}."
+												message=f"You have been added to a ticket by {request.user.inventor.preferred_name}."
 										)
 						return Response(serializer.data, status=status.HTTP_201_CREATED)
 				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

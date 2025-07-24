@@ -45,6 +45,7 @@ class TicketSerializer(serializers.ModelSerializer):
 
 
 class PatentSerializer(serializers.ModelSerializer):
+    inventors = InventorSerializer(many=True, read_only=True)
 
     class Meta:
         model = Patent
