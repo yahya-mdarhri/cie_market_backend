@@ -15,6 +15,7 @@ class Affiliation(models.Model):
 
 class Inventor(models.Model):
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+  old_id = models.CharField(max_length=20, unique=True, null=True, blank=True)
   preferred_name = models.CharField(max_length=150, null=False)
   name_variants = ArrayField(
     models.CharField(max_length=30),
