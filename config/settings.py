@@ -45,7 +45,7 @@ CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "https://8387ec9a.inn2market-inventor-frontend.pages.dev",
+    "https://inn2market-inventor-frontend.pages.dev",
 ]
 
 # Application definition
