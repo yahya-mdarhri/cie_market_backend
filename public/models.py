@@ -46,5 +46,27 @@ class MailingListSignup(models.Model):
     submitted_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table = 'mailing_list_signups'
+        db_table = 'mailing_list_submissions'
         ordering = ['-submitted_at']
+        
+class ContactSubmission(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    CONTACT_TYPE_CHOICES = [
+        ('inventor', 'Inventor'),
+        ('company', 'Company'),
+    ]
+
+    contact_type = models.CharField(max_length=20, choices=CONTACT_TYPE_CHOICES)
+    name = models.CharField(max_length=255)
+    email = models.EmailField()
+    phone = models.CharField(max_length=30)
+    company_name = models.CharField(max_length=255, blank=True, null=True)
+    position = models.CharField(max_length=255, blank=True, null=True)
+    subject = models.CharField(max_length=255)
+    message = models.TextField()
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+      db_table = 'contact_us_submissions'
+      ordering = ['-submitted_at']
