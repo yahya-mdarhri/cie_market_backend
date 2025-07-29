@@ -4,9 +4,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-from rest_framework import serializers
 
-from public.serializers import InnovationDiagnosisSubmissionSerializer, MailingListSignupSerializer
+from public.serializers import InnovationDiagnosisSubmissionSerializer, MailingListSignupSerializer, ContactSubmissionSerializer
 
 # Create your views here.
 
@@ -51,3 +50,24 @@ class MailingListSignupView(viewsets.ViewSet):
             serializer.save()
             return Response({'message': 'Signup saved successfully.'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ContactUsView(viewsets.ViewSet):
+	permission_classes = [AllowAny]
+
+	@swagger_auto_schema(
+			operation_description="ContactSubmissionSerializer Us",
+			request_body=MailingListSignupSerializer,
+			responses={
+					201: openapi.Response(description="Your submission saved successfully."),
+					400: openapi.Response(description="Validation error.")
+			},
+			tags=['public'],
+			operation_summary="Contact Us submit",
+	)
+	def create(self, request):
+		serializer = ContactSubmissionSerializer(data=request.data)
+		if serializer.is_valid():
+			serializer.save()
+			return Response({'message': 'Your submission saved successfully.'}, status=status.HTTP_201_CREATED)
+		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
