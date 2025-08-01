@@ -34,6 +34,7 @@ from inventors.serializers import InventorSerializer
 from config.pagination import Paginator
 
 import string, secrets
+from inventors.models import Inventor
 
 class UserMeView(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
@@ -477,18 +478,38 @@ class ManagerCreateInventorAccount(viewsets.ViewSet):
 				SHARED_MANAGER_PASSWORD = 'default_1qaz2wsx3edc4rfv'
 				data = request.data
 				shared_password = data.get('shared_password')
-				inventor_data = data.get('inventor')
-				if not shared_password or not inventor_data:
+				inventor_data = data.get('inventor', None)
+				selected_inventor = data.get('selected_inventor', None)
+				if not shared_password or (not inventor_data and not selected_inventor):
 						return Response({"error": "Shared password and inventor data are required."}, status=status.HTTP_400_BAD_REQUEST)
 				if shared_password != SHARED_MANAGER_PASSWORD:
 						return Response({"error": "Invalid shared password."}, status=status.HTTP_403_FORBIDDEN)
-				inventor_serializer = InventorSerializer(data=inventor_data)
-				if not inventor_serializer.is_valid():
-						return Response(inventor_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-				inventor = inventor_serializer.save()
+				if not selected_inventor and not inventor_data:
+						return Response({"error": "Either selected inventor or inventor data must be provided."}, status=status.HTTP_400_BAD_REQUEST)
+				if selected_inventor and inventor_data:
+						return Response({"error": "Please provide either selected inventor or inventor data, not both."}, status=status.HTTP_400_BAD_REQUEST)
+				inventor = None
+				# If a specific inventor is selected, fetch it; otherwise, create a new one
+				if selected_inventor:
+					try:
+						inventor = Inventor.objects.get(id=selected_inventor)
+					except Inventor.DoesNotExist:
+						return Response({"error": "Selected inventor does not exist."}, status=status.HTTP_404_NOT_FOUND)
+				elif inventor_data:
+					if Inventor.objects.filter(email=inventor_data.get('email')).exists():
+						return Response({"error": "An inventor with this email already exists."}, status=status.HTTP_400_BAD_REQUEST)
+					inventor_serializer = InventorSerializer(data=inventor_data)
+					if not inventor_serializer.is_valid():
+							return Response(inventor_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+					inventor = inventor_serializer.save()
 				generated_password = self.generate_password()
+				email = str(inventor.id) + '@inn2market.ma'
+				if inventor.email and inventor.email != 'NULL':
+						email = inventor.email
+				if User.objects.filter(email=email).exists():
+						return Response({"error": "A user with this email already exists."}, status=status.HTTP_400_BAD_REQUEST)
 				user = User.objects.create(
-						email=inventor_data.get('email'),
+						email=email,
 						inventor=inventor,
 						password=make_password(generated_password)
 				)
@@ -504,4 +525,3 @@ class ManagerCreateInventorAccount(viewsets.ViewSet):
 						fail_silently=False,
 				)
 				return Response({"message": "Inventor account created and credentials sent via email.", "credentials": {"email": user.email, "password": generated_password}}, status=status.HTTP_201_CREATED)
-        

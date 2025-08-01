@@ -15,4 +15,6 @@ __pycache__/
 .DS_Store
 **/migrations
 **/migrations/
+**/__pycache__
+**/__pycache__/
 uploads/
