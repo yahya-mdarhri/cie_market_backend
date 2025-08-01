@@ -527,8 +527,8 @@ class CreateTicketView(viewsets.ViewSet):
 				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class SearchInventorByNameView(APIView):
-    permission_classes = [IsAuthenticated]
-
+    # permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny] 
     @swagger_auto_schema(
         operation_description="Search inventors by name (case-insensitive)",
         manual_parameters=Paginator.PARAMETERS_DOCS,
@@ -554,7 +554,10 @@ class SearchInventorByNameView(APIView):
         name_query = request.data.get('name', None)
         if not name_query:
             return Response({"error": "Missing 'name' in request body"}, status=status.HTTP_400_BAD_REQUEST)
-        inventors = Inventor.objects.filter(preferred_name__icontains=name_query).order_by('id').exclude(id=request.user.inventor.id)
+        if request.user.is_authenticated:
+          inventors = Inventor.objects.filter(preferred_name__icontains=name_query).order_by('id').exclude(id=request.user.inventor.id)
+        else:
+          inventors = Inventor.objects.filter(preferred_name__icontains=name_query).order_by('id')
         paginator = Paginator()
         results = paginator.paginate_queryset(inventors, request)
         if not results:
