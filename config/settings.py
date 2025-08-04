@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from datetime import timedelta
 from pathlib import Path
 from decouple import Config, Csv, RepositoryEnv
+from django.core.files.storage import storages
+from storages.backends.s3boto3 import S3Boto3Storage
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -26,6 +28,17 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads')
 env_path = BASE_DIR / '.env'
 config = Config(RepositoryEnv(str(env_path)))
 
+# storage configuration
+AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
+AWS_S3_ENDPOINT_URL = config('AWS_S3_ENDPOINT_URL')
+AWS_S3_REGION_NAME = config('AWS_S3_REGION_NAME', default='auto')
+AWS_S3_ADDRESSING_STYLE = config('AWS_S3_ADDRESSING_STYLE', default='path')
+AWS_QUERYSTRING_AUTH = True
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+storages._storages.clear()
+storages._storages["default"] = S3Boto3Storage()
 
 
 # Quick-start development settings - unsuitable for production
