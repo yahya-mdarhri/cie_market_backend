@@ -44,9 +44,39 @@ class TicketSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 
+from rest_framework import serializers
+from .models import Patent, Inventor
+
+
+from rest_framework import serializers
+from .models import Patent
+
+
 class PatentSerializer(serializers.ModelSerializer):
     inventors = InventorSerializer(many=True, read_only=True)
+
+
+    research_report_result = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField()
+    contract_type = serializers.SerializerMethodField()
+    sector = serializers.SerializerMethodField()
+    nature = serializers.SerializerMethodField()
 
     class Meta:
         model = Patent
         fields = '__all__'
+
+    def get_research_report_result(self, obj):
+        return obj.get_research_report_result_display()
+
+    def get_status(self, obj):
+        return obj.get_status_display()
+
+    def get_contract_type(self, obj):
+        return obj.get_contract_type_display()
+
+    def get_sector(self, obj):
+        return obj.get_sector_display()
+
+    def get_nature(self, obj):
+        return obj.get_nature_display()
