@@ -47,7 +47,7 @@ class Ticket(models.Model):
   summary = models.CharField(max_length=255, null=False)
   context = models.TextField(null=False)
   problem_identification = models.TextField(null=False)
-  drawings = models.FileField(upload_to='drawings/', null=True, blank=True)  # <-- single file field
+  drawings = models.FileField(upload_to='tickets/', null=True, blank=True)  # <-- single file field
   inventors = models.ManyToManyField(Inventor, related_name='tickets') # ticket -> inventors (1-way)
   co_applications = ArrayField(
     models.CharField(max_length=255),
@@ -103,12 +103,12 @@ class Patent(models.Model):
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
   title = models.CharField(max_length=255, null=False, blank=False)
   deposit_number = models.BigIntegerField(null=False, unique=True)
-  deposit_document = models.CharField(max_length=255, null=False, blank=False) # maybe a file field
+  deposit_document = models.FileField(upload_to='patents/', null=True, blank=True)
   deposit_date = models.DateField(null=True, blank=True)
-  research_report_document = models.CharField(max_length=255, null=False, blank=False) # maybe a file field
+  research_report_document = models.FileField(upload_to='patents/', null=True, blank=True)
   research_report_result = models.CharField(max_length=1, choices=RESEARCH_REPORT_RESULT, default='A') # Note_1
   research_report_date = models.DateField(null=True, blank=True)
-  delivery_document = models.CharField(max_length=255, null=False, blank=False) # maybe a file field
+  delivery_document = models.FileField(upload_to='patents/', null=True, blank=True)
   delivery_date = models.DateField(null=True, blank=True)
   status = models.CharField(max_length=1, choices=PATENT_STATUS, null=False, default='A') # Note_1
   inventors = models.ManyToManyField(Inventor, related_name='patents') # no reverse relation
