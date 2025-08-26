@@ -60,8 +60,20 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:5173",
     "https://inn2market-inventor-frontend.pages.dev",
+    "https://inn2market-inventor-frontend.pages.dev/"
+    
+
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://backendciemarketplace-56178e577139.herokuapp.com",
+    "https://inn2market-inventor-frontend.pages.dev/"
+    
+]
+
+# Allow cookies over HTTPS
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
 # Application definition
 AUTH_COOKIE = 'access_token'
 AUTH_USER_MODEL = 'accounts.User'
