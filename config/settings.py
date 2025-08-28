@@ -54,23 +54,21 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 
 APPEND_SLASH = True
 
-CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_CREDENTIALS = True
+
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:5173",
     "https://inn2market-inventor-frontend.pages.dev",
-    "https://inn2market-inventor-frontend.pages.dev/"
-    "https://cie-market-frontend.pages.dev/"
-    
-
+    "https://cie-market-frontend.pages.dev",
 ]
+
+
 
 CSRF_TRUSTED_ORIGINS = [
     "https://backendciemarketplace-56178e577139.herokuapp.com",
-    "https://inn2market-inventor-frontend.pages.dev/"
-    "https://cie-market-frontend.pages.dev/"
-    
+    "https://inn2market-inventor-frontend.pages.dev",
+    "https://cie-market-frontend.pages.dev",
 ]
 
 # Allow cookies over HTTPS
