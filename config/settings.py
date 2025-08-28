@@ -61,6 +61,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "https://inn2market-inventor-frontend.pages.dev",
     "https://inn2market-inventor-frontend.pages.dev/"
+    "https://cie-market-frontend.pages.dev/"
     
 
 ]
@@ -68,6 +69,7 @@ CORS_ALLOWED_ORIGINS = [
 CSRF_TRUSTED_ORIGINS = [
     "https://backendciemarketplace-56178e577139.herokuapp.com",
     "https://inn2market-inventor-frontend.pages.dev/"
+    "https://cie-market-frontend.pages.dev/"
     
 ]
 
@@ -115,11 +117,9 @@ INSTALLED_APPS = [
     'accounts',
     'inventors',
     'public',
-
     'drf_yasg',
     'corsheaders',
     'rest_framework',
-
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
