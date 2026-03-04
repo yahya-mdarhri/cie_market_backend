@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from datetime import timedelta
 from pathlib import Path
 from decouple import Config, Csv, RepositoryEnv
+import dj_database_url
 from django.core.files.storage import storages
 from storages.backends.s3boto3 import S3Boto3Storage
 import os
@@ -180,14 +181,15 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST', default='localhost'),
-        'PORT': config('DB_PORT', default='5432'),
-    }
+    'default': dj_database_url.config(
+        default=(
+            f"postgresql://{config('DB_USER')}:{config('DB_PASSWORD')}@"
+            f"{config('DB_HOST', default='localhost')}:{config('DB_PORT', default='5432')}/"
+            f"{config('DB_NAME')}"
+        ),
+        conn_max_age=config('DB_CONN_MAX_AGE', default=60, cast=int),
+        ssl_require=config('DB_SSL_REQUIRE', default=False, cast=bool),
+    )
 }
 
 
