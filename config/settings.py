@@ -58,18 +58,16 @@ APPEND_SLASH = True
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://localhost:5173",
-    "https://inn2market-inventor-frontend.pages.dev",
-    "https://cie-market-frontend.pages.dev",
+    "http://192.168.1.171:8090/",
+    "http://192.168.1.171:8080/"
+
 ]
 
 
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://backendciemarketplace-56178e577139.herokuapp.com",
-    "https://inn2market-inventor-frontend.pages.dev",
-    "https://cie-market-frontend.pages.dev",
+    "http://192.168.1.171:8090/",
+    "http://192.168.1.171:8080/"
 ]
 
 # Allow cookies over HTTPS
