@@ -75,6 +75,19 @@ CSRF_TRUSTED_ORIGINS = [
 # Allow cookies over HTTPS
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
+# Make cookie security and samesite configurable so local HTTP frontends can work in dev.
+# Defaults: secure=True and samesite=None in production; when DEBUG=True default is relaxed.
+COOKIE_SECURE = config('COOKIE_SECURE', default=(not DEBUG), cast=bool)
+COOKIE_SAMESITE = config('COOKIE_SAMESITE', default=('Lax' if DEBUG else 'None'))
+
+# Allow adding extra CORS and CSRF origins from env for local/dev use (comma-separated)
+EXTRA_CORS_ORIGINS = config('EXTRA_CORS_ORIGINS', default='', cast=Csv())
+if EXTRA_CORS_ORIGINS:
+    CORS_ALLOWED_ORIGINS += [o for o in EXTRA_CORS_ORIGINS if o]
+
+EXTRA_CSRF_ORIGINS = config('EXTRA_CSRF_ORIGINS', default='', cast=Csv())
+if EXTRA_CSRF_ORIGINS:
+    CSRF_TRUSTED_ORIGINS += [o for o in EXTRA_CSRF_ORIGINS if o]
 # Application definition
 AUTH_COOKIE = 'access_token'
 AUTH_USER_MODEL = 'accounts.User'

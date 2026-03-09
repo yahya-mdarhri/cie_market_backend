@@ -34,7 +34,7 @@ def store_token_in_cookies(response, token) -> None:
         value=token,
         expires=expires_at,
         httponly=True,
-        secure=True,
-        samesite='None',
+        secure=getattr(settings, 'COOKIE_SECURE', True),
+        samesite=getattr(settings, 'COOKIE_SAMESITE', 'None'),
         path='/',
     )
